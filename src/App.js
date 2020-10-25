@@ -1,11 +1,12 @@
-import * as React from 'react'
-import VideoStreamingScreen from './pages/VideoStreamingScreen'
+import * as React from "react";
+import Body from "./body/Body";
 
 class App extends React.Component {
-  
   render() {
     return (
-      <VideoStreamingScreen />
+      <div>
+        <Body />
+      </div>
     );
   }
 }

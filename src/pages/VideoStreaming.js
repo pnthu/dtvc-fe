@@ -1,6 +1,6 @@
 import * as React from "react";
 
-class VideoStreamingScreen extends React.Component {
+class VideoStreaming extends React.Component {
   constructor(props) {
     super(props);
     this.canvasRef = React.createRef();
@@ -58,7 +58,7 @@ class VideoStreamingScreen extends React.Component {
           ctx.stroke();
         }
         ctx.closePath();
-        ctx.fill()
+        ctx.fill();
       }
     }
   };
@@ -106,4 +106,4 @@ class VideoStreamingScreen extends React.Component {
   }
 }
 
-export default VideoStreamingScreen;
+export default VideoStreaming;
