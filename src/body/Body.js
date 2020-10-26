@@ -1,12 +1,12 @@
 import * as React from "react";
 import { Switch, Route, Link } from "react-router-dom";
-import AccountManagement from "../pages/AccountManagement";
-import CameraManagement from "../pages/CameraManagement";
-import Login from "../pages/Login";
-import RecordManagement from "../pages/RecordManagement";
-import Report from "../pages/Report";
-import VideoStreaming from "../pages/VideoStreaming";
-import Error from "../pages/Error";
+import AccountManagement from "../user-management/AccountManagement";
+import CameraManagement from "../surveillance-system/CameraManagement";
+import Login from "../user-management/Login";
+import RecordManagement from "../records/RecordManagement";
+import Report from "../report/Report";
+import VideoStreaming from "../video-streaming/VideoStreaming";
+import Error from "./Error";
 import Header from "../components/Header";
 
 class Body extends React.Component {
