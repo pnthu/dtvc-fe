@@ -5,8 +5,8 @@ import "./header.css";
 const permissions = {
   moderator: [
     { link: "/streaming", name: "Video Streaming" },
-    { link: "/cameras", name: "Camera Management" },
-    { link: "/records", name: "Record Management" },
+    { link: "/cameras", name: "Surveillance System" },
+    { link: "/records", name: "Records" },
     { link: "/report", name: "Report" },
   ],
   admin: [{ link: "/accounts", name: "Account Management" }],
