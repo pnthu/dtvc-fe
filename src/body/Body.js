@@ -18,9 +18,9 @@ class Body extends React.Component {
     if (role === "admin") {
       routes = (
         <>
-          <div>
+          {/* <div>
             <Link to="/accounts">Accounts</Link>
-          </div>
+          </div> */}
           <Switch>
             <Route path="/accounts" exact component={AccountManagement} />
             <Route component={Error} />
@@ -36,7 +36,7 @@ class Body extends React.Component {
             <Link to="/records">Record Management</Link>
             <Link to="/report">Report</Link>
           </div> */}
-          <Header />
+          <Header role={role} />
           <Switch>
             <Route path="/streaming" exact component={VideoStreaming} />
             <Route path="/cameras" exact component={CameraManagement} />

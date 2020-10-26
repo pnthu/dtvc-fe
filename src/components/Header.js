@@ -1,18 +1,12 @@
 import * as React from "react";
-import styled from "styled-components";
-import { Link } from "react-router-dom";
-
-const Nav = styled.nav`
-  height: 80px;
-  color: white;
-  background-color: #17608d;
-`;
+import { NavLink } from "react-router-dom";
+import "./header.css";
 
 const permissions = {
   moderator: [
     { link: "/streaming", name: "Video Streaming" },
     { link: "/cameras", name: "Camera Management" },
-    { link: "/records", name: "Reacord Management" },
+    { link: "/records", name: "Record Management" },
     { link: "/report", name: "Report" },
   ],
   admin: [{ link: "/accounts", name: "Account Management" }],
@@ -20,7 +14,28 @@ const permissions = {
 
 class Header extends React.Component {
   render() {
-    return <Nav>{permissions[this.props.role]}</Nav>;
+    console.log("props", this.props);
+    return (
+      <nav className="header">
+        <div className="left">
+          <img src={require("../logo.svg")} width={40} height={40} />
+        </div>
+        <div className="right">
+          {permissions[this.props.role] instanceof Array &&
+            permissions[this.props.role].map((permission) => {
+              return (
+                <NavLink
+                  to={permission.link}
+                  activeStyle={{ fontWeight: "bold" }}
+                >
+                  {permission.name}
+                </NavLink>
+              );
+            })}
+          <div>Hello, User</div>
+        </div>
+      </nav>
+    );
   }
 }
 

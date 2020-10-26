@@ -1,0 +1,30 @@
+.header {
+  background-color: #17608d;
+  height: 60px;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0px 16px;
+  width: 100%;
+}
+
+.left {
+  width: 15%;
+  margin-right: 20%;
+}
+
+.right {
+  width: 65%;
+  display: flex;
+  justify-content: space-around;
+}
+
+.right a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.right a:hover {
+  font-weight: bold;
+}
