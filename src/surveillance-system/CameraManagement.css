@@ -1,0 +1,32 @@
+.title-camera-management h1{
+    color: #024d96;
+    text-align: center;
+}
+
+.parent-create-new {
+    text-align: right;
+}
+
+.parent-create-new button {
+    margin-right: 10%;
+    margin-bottom: 20px;
+}
+
+.camera-table {
+    width: 97%;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.new-camera {
+    display: inline-block;
+    padding-left: 10px;
+}
+
+.ant-table-tbody .ant-switch.ant-switch-checked {
+    background-color: green;
+}
+
+.ant-table-tbody tr td:last-child {
+    width: 238px;
+}

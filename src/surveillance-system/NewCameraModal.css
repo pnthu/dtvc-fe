@@ -1,0 +1,27 @@
+.test-image {
+    height: 300px;
+    width: 100%;
+}
+
+.title-new-camera {
+    color: #024d96;
+    font-size: 20px;
+}
+
+#submit-form-new-camera {
+    margin-left: 12%;
+}
+
+.ant-modal-content {
+    top: -60px;
+}
+
+#test-connection-button {
+    position: absolute;
+    left: 70.6%;
+    top: 316px;
+}
+
+.ant-modal-wrap .ant-modal .ant-modal-content {
+    border-radius: 8px 8px 8px 8px;
+}
