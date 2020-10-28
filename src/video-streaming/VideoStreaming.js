@@ -1,4 +1,5 @@
 import * as React from "react";
+import SockJS from "sockjs-client";
 
 class VideoStreaming extends React.Component {
   constructor(props) {
@@ -12,6 +13,9 @@ class VideoStreaming extends React.Component {
       canvasOffsetLeft: 0,
       canvasOffsetTop: 0,
     };
+    this.socket = new SockJS("http://localhost:8080/gs-guide-websocket");
+    this.Stomp = require('stompjs');
+    this.stompClient = this.Stomp.over(this.socket);
   }
 
   handleMouseDown = (evt) => {
@@ -89,7 +93,25 @@ class VideoStreaming extends React.Component {
         };
       }
     }
+
+    this.stompClient.connect({}, (frame) => {
+      // this.stompClient.setConnected(true);
+      // while (true) {
+      //   this.sendMessage();
+      // }
+      console.log("Connected: " + frame);
+      this.stompClient.subscribe('/dtvc/camera', function (newFrame) {
+        console.log(JSON.parse(newFrame.body));
+        this.setState(...this.state, {frame: frame});
+      });
+      this.sendMessage();
+    });
+
   };
+
+  sendMessage = (message) => {
+      this.stompClient.send("/get/frame", {}, JSON.stringify({}));
+  }
 
   render() {
     return (

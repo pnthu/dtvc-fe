@@ -1,0 +1,84 @@
+.view-detail-button {
+    border-radius: 20px;
+    border: 1px solid #024d96;
+    background-color: #024d96;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 25px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.view-detail-button:active {
+    transform: scale(0.95);
+}
+
+.view-detail-button:focus {
+    outline: none;
+}
+
+.parent-view-detail-button {
+    width: 100%;
+    text-align: center;
+}
+
+.view-detail-button:hover {
+    cursor: pointer;
+}
+
+.parent-record {
+    width: 25%;
+    border-radius: 15px 15px 15px 15px;
+    border-color: #024d96;
+    border-width: 2px;
+    border-style: solid;
+    height: 550px;
+    position: absolute;
+}
+
+.image-record {
+    text-align: center;
+    overflow: hidden;
+}
+
+.image-record img {
+    width: 70%;
+    height: 250px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.title-record {
+    text-align: center;
+}
+
+.record-description {
+    width: 100%;
+}
+
+.record-description span {
+    display: inline-block;
+    width: 45%;
+}
+
+.record-description span:nth-child(1) {
+    font-weight: bold;
+    margin-left: 4%;
+}
+
+.record-description span:nth-child(2) {
+    text-align: right;
+}
+
+.pagination-record {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.ant-pagination-item {
+    font-size: 16px;
+}
