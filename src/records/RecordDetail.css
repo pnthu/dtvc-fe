@@ -1,0 +1,27 @@
+.modalTitle {
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.ant-modal {
+  width: 650px !important;
+}
+
+.ant-modal-content {
+  border-radius: 8px;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.modalRight {
+  text-align: right;
+}

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Switch, Route, Link } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 import AccountManagement from "../user-management/AccountManagement";
 import CameraManagement from "../surveillance-system/CameraManagement";
 import Login from "../user-management/Login";
@@ -18,9 +18,7 @@ class Body extends React.Component {
     if (role === "admin") {
       routes = (
         <>
-          <div>
-            <Link to="/accounts">Accounts</Link>
-          </div>
+          <Header role={role} />
           <Switch>
             <Route path="/accounts" exact component={AccountManagement} />
             <Route component={Error} />
@@ -30,13 +28,7 @@ class Body extends React.Component {
     } else if (role === "moderator") {
       routes = (
         <>
-          {/* <div>
-            <Link to="/streaming">Video Streaming</Link>
-            <Link to="/cameras">Camera Management</Link>
-            <Link to="/records">Record Management</Link>
-            <Link to="/report">Report</Link>
-          </div> */}
-          <Header />
+          <Header role={role} />
           <Switch>
             <Route path="/streaming" exact component={VideoStreaming} />
             <Route path="/cameras" exact component={CameraManagement} />
