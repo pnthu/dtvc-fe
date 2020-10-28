@@ -1,0 +1,45 @@
+.loginBackground {
+  height: 100vh;
+  background-color: #f6ddc7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0px;
+}
+
+.logo {
+  width: 150px;
+  height: 150px;
+  margin: 30px 0px;
+}
+
+.login {
+  width: 100px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: #17608d;
+  color: white;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background-color: #125887;
+}
+
+.loginTitle {
+  color: #17608d;
+}
+
+.ant-input:hover,
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper:hover,
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused {
+  border-color: #c4c4c4;
+}
+
+.ant-form-item-control-input-content {
+  text-align: center;
+}
