@@ -12,11 +12,6 @@ class Login extends React.Component {
     };
   }
 
-  login = () => {
-    window.sessionStorage.setItem("role", "moderator");
-    this.props.history.push("/streaming");
-  };
-
   render() {
     console.log("props", this.props);
     return (
@@ -41,10 +36,10 @@ class Login extends React.Component {
             <Button
               type="primary"
               htmlType="submit"
-              onClick={this.login}
+              onClick={this.props.login}
               className="login"
             >
-              Submit
+              Sign In
             </Button>
           </Form.Item>
         </Form>

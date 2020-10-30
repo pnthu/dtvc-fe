@@ -1,27 +1,32 @@
 .test-image {
-    height: 300px;
-    width: 100%;
+  height: 300px;
+  width: 100%;
+  margin: 16px 0px;
 }
 
 .title-new-camera {
-    color: #024d96;
-    font-size: 20px;
-}
-
-#submit-form-new-camera {
-    margin-left: 12%;
+  color: #17608d;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 10px;
 }
 
 .ant-modal-content {
-    top: -60px;
+  top: -60px;
 }
 
-#test-connection-button {
-    position: absolute;
-    left: 70.6%;
-    top: 316px;
+.test-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.test-row button {
+  border-color: #17608d;
+  border-radius: 8px;
+  color: #17608d;
 }
 
 .ant-modal-wrap .ant-modal .ant-modal-content {
-    border-radius: 8px 8px 8px 8px;
+  border-radius: 8px 8px 8px 8px;
 }

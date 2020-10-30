@@ -18,6 +18,7 @@
   width: 100px;
   height: 40px;
   border-radius: 20px;
+  border-color: #17608d;
   background-color: #17608d;
   color: white;
 }
@@ -25,10 +26,12 @@
 .ant-btn-primary:hover,
 .ant-btn-primary:focus {
   background-color: #125887;
+  border-color: #125887;
 }
 
 .loginTitle {
   color: #17608d;
+  font-weight: bold;
 }
 
 .ant-input:hover,
@@ -42,4 +45,9 @@
 
 .ant-form-item-control-input-content {
   text-align: center;
+}
+
+.ant-input,
+.ant-input-affix-wrapper {
+  border-radius: 6px;
 }

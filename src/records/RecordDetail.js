@@ -17,7 +17,11 @@ class RecordDetail extends React.Component {
   render() {
     console.log("data", this.props);
     return (
-      <Modal visible={this.props.visible} footer={null} maskClosable>
+      <Modal
+        visible={this.props.visible}
+        footer={null}
+        className="detail-modal"
+      >
         <h3 className="title">VIOLATION RECORD</h3>
         <div className="container">
           <div>

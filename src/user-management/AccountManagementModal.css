@@ -1,16 +1,9 @@
-.title-new-camera {
-    color: #024d96;
-    font-size: 20px;
-}
-
-#submit-form-new-camera {
-    margin-left: 12%;
-}
-
-.ant-modal-wrap .ant-modal .ant-modal-content {
-    border-radius: 8px 8px 8px 8px;
+.create-modal {
+  border-radius: 8px;
+  width: 480px !important;
+  padding: 0px 20px 0px 10px;
 }
 
 #basic div:last-child {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
 }

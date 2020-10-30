@@ -3,7 +3,7 @@ import "antd/dist/antd.css";
 import { Input, Table, Button, Select } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
-import "./recordManagement.css";
+import "./RecordManagement.css";
 import RecordDetail from "./RecordDetail";
 
 const dataSource = [
