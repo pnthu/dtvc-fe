@@ -32,6 +32,7 @@ class DrawLines extends React.Component {
             y: evt.clientY - this.state.canvasOffsetTop - tmp,
           },
         });
+        console.log("point", this.state.point);
         points.push(this.state.point);
         ctx.beginPath();
         ctx.moveTo(this.state.point.x, this.state.point.y);
@@ -59,6 +60,7 @@ class DrawLines extends React.Component {
             y: evt.clientY - this.state.canvasOffsetTop - tmp,
           },
         });
+        console.log("point", this.state.point);
         points.push(this.state.point);
         ctx.beginPath();
         ctx.moveTo(this.state.point.x, this.state.point.y);
@@ -86,6 +88,7 @@ class DrawLines extends React.Component {
             y: evt.clientY - this.state.canvasOffsetTop - tmp,
           },
         });
+        console.log("point", this.state.point);
         points.push(this.state.point);
         ctx.beginPath();
         ctx.moveTo(this.state.point.x, this.state.point.y);

@@ -21,7 +21,7 @@
 .filter {
   display: grid;
   gap: 20px;
-  grid-auto-flow: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 50% 33% 17%;
   grid-auto-flow: column;
   width: 60%;
   margin: 30px;

@@ -25,31 +25,31 @@ class VideoStreaming extends React.Component {
   componentDidMount() {
     var self = this;
 
-    //socket right
-    this.rightStompClient.connect({}, (frame) => {
-      this.rightStompClient.subscribe("/dtvc/right/camera", function (
-        newFrame
-      ) {
-        var tmpFrame =
-          "data:image/jpeg;base64," + JSON.parse(newFrame.body)["frame"];
-        self.setState({ rightImageCamera: tmpFrame });
-      });
-      setInterval(() => {
-        this.getFrameOfRightCamera();
-      }, 2000);
-    });
+    // //socket right
+    // this.rightStompClient.connect({}, (frame) => {
+    //   this.rightStompClient.subscribe("/dtvc/right/camera", function (
+    //     newFrame
+    //   ) {
+    //     var tmpFrame =
+    //       "data:image/jpeg;base64," + JSON.parse(newFrame.body)["frame"];
+    //     self.setState({ rightImageCamera: tmpFrame });
+    //   });
+    //   setInterval(() => {
+    //     this.getFrameOfRightCamera();
+    //   }, 2000);
+    // });
 
-    //socket left
-    this.leftStompClient.connect({}, (frame) => {
-      this.leftStompClient.subscribe("/dtvc/left/camera", function (newFrame) {
-        var tmpFrame =
-          "data:image/jpeg;base64," + JSON.parse(newFrame.body)["frame"];
-        self.setState({ leftImageCamera: tmpFrame });
-      });
-      setInterval(() => {
-        this.getFrameOfLeftCamera();
-      }, 1000);
-    });
+    // //socket left
+    // this.leftStompClient.connect({}, (frame) => {
+    //   this.leftStompClient.subscribe("/dtvc/left/camera", function (newFrame) {
+    //     var tmpFrame =
+    //       "data:image/jpeg;base64," + JSON.parse(newFrame.body)["frame"];
+    //     self.setState({ leftImageCamera: tmpFrame });
+    //   });
+    //   setInterval(() => {
+    //     this.getFrameOfLeftCamera();
+    //   }, 1000);
+    // });
   }
 
   getFrameOfLeftCamera = (message) => {

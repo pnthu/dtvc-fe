@@ -1,7 +1,7 @@
 import * as React from "react";
 import "antd/dist/antd.css";
 import moment from "moment";
-import { Input, Table, Button, Select } from "antd";
+import { Input, Table, Button, Select, DatePicker } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import "./RecordManagement.css";
@@ -17,6 +17,11 @@ class RecordManagement extends React.Component {
         violationType: { name: "" },
       },
       data: [],
+      types: [],
+      selectedType: "",
+      selectedStatus: "",
+      fromDate: "",
+      toDate: "",
     };
   }
 
@@ -53,14 +58,9 @@ class RecordManagement extends React.Component {
       key: "location",
       ellipsis: true,
     },
-    // {
-    //   title: "Inspector",
-    //   dataIndex: "inspector",
-    //   key: "inspector",
-    // },
     {
       title: "Status",
-      dataIndex: ["image", "camera", "status"],
+      dataIndex: "caseType",
       key: "status",
     },
     {
@@ -99,8 +99,12 @@ class RecordManagement extends React.Component {
     this.setState({ visible: false });
   };
 
+  onClose = () => {
+    this.setState({ visible: false });
+  };
+
   fetchAllCases = () => {
-    fetch("http://localhost:8081/api_war_exploded/case/getAll", {
+    fetch("http://localhost:8080/case/getAll", {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -116,8 +120,77 @@ class RecordManagement extends React.Component {
       });
   };
 
+  fetchViolationTypes = () => {
+    fetch("http://localhost:8080/case/getViolationType", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((Response) => Response.json())
+      .then((types) => {
+        this.setState({ types: types });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  filter = (from = "", to = "", violationType = 1, caseType = "") => {
+    fetch(
+      `http://localhost:8080/case/filter?fromDate=${from}&toDate=${to}&violationId=${violationType}&caseType=${caseType}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((Response) => Response.json())
+      .then((cases) => {
+        this.setState({ data: cases });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  onSelectedType = (value, option) => {
+    this.setState({ selectedType: value });
+    this.filter(
+      this.state.fromDate,
+      this.state.toDate,
+      value,
+      this.state.selectedStatus
+    );
+  };
+
+  onSelectedStatus = (value, option) => {
+    this.setState({ selectedStatus: value });
+    this.filter(
+      this.state.fromDate,
+      this.state.toDate,
+      this.state.selectedType,
+      value
+    );
+  };
+
+  onSelectedDates = (dates, dateStrings) => {
+    console.log("dates", dates);
+    const from = moment(dates[0]).format("yyyy-MM-DD");
+    const to = moment(dates[1]).format("yyyy-MM-DD");
+    this.setState({
+      fromDate: from,
+      toDate: to,
+    });
+    this.filter(from, to, this.state.selectedType, this.state.selectedStatus);
+  };
+
   componentDidMount = () => {
     this.fetchAllCases();
+    this.fetchViolationTypes();
   };
 
   render() {
@@ -127,16 +200,28 @@ class RecordManagement extends React.Component {
           <div className="box">
             <h2 className="title">Records Management</h2>
             <div className="filter">
-              <Input type="date" placeholder="From" />
-              <Input type="date" placeholder="To" />
-              <Select showSearch placeholder="Violation Type">
-                <Select.Option>Passing red light</Select.Option>
-                <Select.Option>Not wearing helmet</Select.Option>
+              <DatePicker.RangePicker
+                placeholder={["From", "To"]}
+                format="DD/MM/yyyy"
+                onChange={this.onSelectedDates}
+              />
+              <Select
+                placeholder="Violation Type"
+                onChange={this.onSelectedType}
+              >
+                {this.state.types.map((type) => (
+                  <Select.Option
+                    key={type.violationId}
+                    value={type.violationId}
+                  >
+                    {type.name}
+                  </Select.Option>
+                ))}
               </Select>
-              <Select showSearch placeholder="Status">
-                <Select.Option>Pending</Select.Option>
-                <Select.Option>Approved</Select.Option>
-                <Select.Option>Rejected</Select.Option>
+              <Select placeholder="Status">
+                <Select.Option value="unconfirmed">Pending</Select.Option>
+                <Select.Option value="punishment">Approved</Select.Option>
+                <Select.Option value="rejected">Rejected</Select.Option>
               </Select>
             </div>
             <div>
@@ -153,6 +238,7 @@ class RecordManagement extends React.Component {
           data={this.state.record}
           handleApprove={this.handleApprove}
           handleReject={this.handleReject}
+          onClose={this.onClose}
         />
       </>
     );
