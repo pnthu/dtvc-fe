@@ -13,13 +13,14 @@ class VideoStreaming extends React.Component {
       leftImageCamera: "",
       rightImageCamera: "",
     };
-    this.socket = new SockJS("http://localhost:8080/gs-guide-websocket");
     //left camera
+    this.leftSocket = new SockJS("http://localhost:8080/gs-guide-websocket");
     this.LeftStomp = require("stompjs");
-    this.leftStompClient = this.LeftStomp.over(this.socket);
+    this.leftStompClient = this.LeftStomp.over(this.leftSocket);
     //right camera
+    this.rightSocket = new SockJS("http://localhost:8080/gs-guide-websocket");
     this.RightStomp = require("stompjs");
-    this.rightStompClient = this.RightStomp.over(this.socket);
+    this.rightStompClient = this.RightStomp.over(this.rightSocket);
   }
 
   componentDidMount() {
@@ -34,9 +35,7 @@ class VideoStreaming extends React.Component {
           "data:image/jpeg;base64," + JSON.parse(newFrame.body)["frame"];
         self.setState({ rightImageCamera: tmpFrame });
       });
-      setInterval(() => {
         this.getFrameOfRightCamera();
-      }, 2000);
     });
 
     //socket left
@@ -46,9 +45,7 @@ class VideoStreaming extends React.Component {
           "data:image/jpeg;base64," + JSON.parse(newFrame.body)["frame"];
         self.setState({ leftImageCamera: tmpFrame });
       });
-      setInterval(() => {
         this.getFrameOfLeftCamera();
-      }, 1000);
     });
   }
 
