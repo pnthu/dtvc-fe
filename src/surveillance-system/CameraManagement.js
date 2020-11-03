@@ -52,60 +52,13 @@ const columns = [
   },
 ];
 
-const data = [
-  {
-    key: "1",
-    no: 1,
-    name: "John Brown",
-    location: "New York No. 1 Lake Park",
-    group: "A",
-    position: "left",
-    status: "on",
-  },
-  {
-    key: "2",
-    no: 2,
-    name: "Jim Green",
-    location: "London No. 1 Lake Park",
-    group: "A",
-    position: "right",
-    status: "off",
-  },
-  {
-    key: "3",
-    no: 3,
-    name: "Joe Black",
-    location: "Sidney No. 1 Lake Park",
-    group: "B",
-    position: "left",
-    status: "on",
-  },
-  {
-    key: "4",
-    no: 3,
-    name: "Joe Black",
-    location: "Sidney No. 1 Lake Park",
-    group: "B",
-    position: "left",
-    status: "on",
-  },
-  {
-    key: "5",
-    no: 3,
-    name: "Joe Black",
-    location: "Sidney No. 1 Lake Park",
-    group: "C",
-    position: "left",
-    status: "on",
-  },
-];
-
 class CameraManagement extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
       confirmLoading: false,
+      data: [],
     };
   }
 
@@ -141,26 +94,35 @@ class CameraManagement extends React.Component {
         <div className="background">
           <div className="box">
             <h2 className="title">Camera Management</h2>
-            <div className="parent-create-new">
-              <div className="filter">
-                <Select showSearch placeholder="Location"></Select>
-                <Select placeholder="Status">
-                  <Select.Option>Active</Select.Option>
-                  <Select.Option>Inactive</Select.Option>
+            <div className="top-row">
+              <div className="camera-filter">
+                <Select
+                  showSearch
+                  placeholder="Location"
+                  style={{ width: "50%" }}
+                ></Select>
+                <Select
+                  defaultValue="active"
+                  placeholder="Status"
+                  style={{ width: "40%" }}
+                >
+                  <Select.Option value="active">Active</Select.Option>
+                  <Select.Option value="inactive">Inactive</Select.Option>
                 </Select>
               </div>
-              <Button onClick={this.showModal}>
-                <FontAwesomeIcon icon={faPlus} />
-                <span className="new-camera">New Camera</span>
-              </Button>
+              <div className="new-btn">
+                <Button onClick={this.showModal}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  <span className="new-camera">New Camera</span>
+                </Button>
+              </div>
             </div>
-            <div className="camera-table">
-              <Table
-                columns={columns}
-                dataSource={data}
-                pagination={{ defaultCurrent: 1, total: 10, pageSize: 10 }}
-              />
-            </div>
+            <Table
+              className="table"
+              columns={columns}
+              dataSource={this.state.data}
+              pagination={{ defaultCurrent: 1, total: 10, pageSize: 10 }}
+            />
           </div>
         </div>
         <NewCameraModal

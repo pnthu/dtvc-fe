@@ -32,11 +32,11 @@ class RecordDetail extends React.Component {
             <p className="label">Status</p>
           </div>
           <div className="modalRight">
-            <p>{this.props.data.time}</p>
-            <p>{this.props.data.location}</p>
-            <p>{this.props.data.type}</p>
-            <p>{this.props.data.licensePlateNumber}</p>
-            <p>{this.props.data.status}</p>
+            <p>{this.props.data.createdDate}</p>
+            <p>{this.props.data.image.camera.location}</p>
+            <p>{this.props.data.violationType.name}</p>
+            <p>{this.props.data.licensePlate}</p>
+            <p>{this.props.data.image.camera.status}</p>
           </div>
         </div>
         <div

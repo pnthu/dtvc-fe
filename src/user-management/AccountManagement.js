@@ -129,6 +129,7 @@ class AccountManagement extends React.Component {
             </div>
             <div className="camera-table">
               <Table
+                className="table"
                 columns={columns}
                 dataSource={data}
                 pagination={{ defaultCurrent: 1, total: 10, pageSize: 10 }}

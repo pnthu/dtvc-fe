@@ -1,91 +1,66 @@
 import * as React from "react";
 import "antd/dist/antd.css";
+import moment from "moment";
 import { Input, Table, Button, Select } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import "./RecordManagement.css";
 import RecordDetail from "./RecordDetail";
 
-const dataSource = [
-  {
-    key: "1",
-    no: 1,
-    type: "Stopping red light crossing the line",
-    licensePlateNumber: "59V181250",
-    time: "12:00AM Tue, October 27, 2020",
-    location: "123 Cách Mạng Tháng 8, phường 13, quận 10",
-    inspector: "Nguyễn Văn A",
-    status: "Approved",
-  },
-  {
-    key: "1",
-    no: 1,
-    type: "Stopping red light crossing the line",
-    licensePlateNumber: "59V181250",
-    time: "12:00AM Tue, October 27, 2020",
-    location: "123 Cách Mạng Tháng 8, phường 13, quận 10",
-    inspector: "Nguyễn Văn A",
-    status: "Pending",
-  },
-  {
-    key: "1",
-    no: 1,
-    type: "Stopping red light crossing the line",
-    licensePlateNumber: "59V181250",
-    time: "12:00AM Tue, October 27, 2020",
-    location: "123 Cách Mạng Tháng 8, phường 13, quận 10",
-    inspector: "Nguyễn Văn A",
-    status: "Rejected",
-  },
-];
-
 class RecordManagement extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
-      record: {},
+      record: {
+        image: { camera: { location: "", status: "" } },
+        violationType: { name: "" },
+      },
+      data: [],
     };
   }
 
   columns = [
     {
       title: "No.",
-      dataIndex: "no",
+      dataIndex: "caseId",
       key: "no",
       width: "5%",
     },
     {
       title: "Violation Type",
-      dataIndex: "type",
+      dataIndex: ["violationType", "name"],
       key: "type",
       ellipsis: true,
     },
     {
       title: "License Plate Number",
-      dataIndex: "licensePlateNumber",
+      dataIndex: "licensePlate",
       key: "licensePlateNumber",
     },
     {
       title: "Recorded Time",
-      dataIndex: "time",
+      dataIndex: "createdDate",
       key: "time",
       ellipsis: true,
+      render: (text) => {
+        return moment(text).format("DD/MM/yyyy");
+      },
     },
     {
       title: "Location",
-      dataIndex: "location",
+      dataIndex: ["image", "camera", "location"],
       key: "location",
       ellipsis: true,
     },
-    {
-      title: "Inspector",
-      dataIndex: "inspector",
-      key: "inspector",
-    },
+    // {
+    //   title: "Inspector",
+    //   dataIndex: "inspector",
+    //   key: "inspector",
+    // },
     {
       title: "Status",
-      dataIndex: "status",
+      dataIndex: ["image", "camera", "status"],
       key: "status",
     },
     {
@@ -124,6 +99,27 @@ class RecordManagement extends React.Component {
     this.setState({ visible: false });
   };
 
+  fetchAllCases = () => {
+    fetch("http://localhost:8081/api_war_exploded/case/getAll", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((Response) => Response.json())
+      .then((cases) => {
+        this.setState({ data: cases });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  componentDidMount = () => {
+    this.fetchAllCases();
+  };
+
   render() {
     return (
       <>
@@ -146,7 +142,7 @@ class RecordManagement extends React.Component {
             <div>
               <Table
                 className="table"
-                dataSource={dataSource}
+                dataSource={this.state.data}
                 columns={this.columns}
               />
             </div>

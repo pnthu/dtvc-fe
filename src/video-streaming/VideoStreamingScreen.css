@@ -1,27 +1,22 @@
 .dropbox {
-    margin-left: 30%;
-    margin-top: 10px;
-    width: 30%;
-    margin-bottom: 30px;
-    border-color: black;
-    color: black;
+  margin-left: 30%;
+  margin-top: 30px;
+  width: 30%;
+  margin-bottom: 30px;
+  border-color: black;
+  color: black;
 }
 
 .camera {
-    display: inline-block;
-    width: 48%;
-    margin-left: 14px;
-}
-
-.camera img {
-    width: 100%;
-    height: 380px;
+  display: inline-block;
+  width: 48%;
+  margin-left: 14px;
 }
 
 .camera div {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .wrapper-parent-camera {
-    width: 74%;
+  width: 70%;
 }
