@@ -28,3 +28,34 @@
 .right a:hover {
   font-weight: bold;
 }
+
+.headerRight {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 90px;
+}
+
+.popover {
+  display: flex;
+  flex-direction: column;
+  height: 70px;
+  justify-content: space-between;
+}
+
+.ant-popover-inner {
+  border-radius: 6px;
+}
+
+.btn-secondary {
+  border: none;
+  box-shadow: none;
+  border-radius: 6px;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  color: black;
+  background-color: #f0f0f0;
+}

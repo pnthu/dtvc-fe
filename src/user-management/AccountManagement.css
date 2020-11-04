@@ -1,32 +1,38 @@
-.title-camera-management h1{
-    color: #024d96;
-    text-align: center;
-}
-
 .parent-create-new {
-    text-align: right;
+  text-align: right;
 }
 
 .parent-create-new button {
-    margin-right: 10%;
-    margin-bottom: 20px;
+  margin-right: 5%;
+  margin-bottom: 20px;
+  border-color: #17608d;
+  border-radius: 8px;
+  padding: 8px 15px;
+  height: auto;
+  color: #17608d;
+}
+
+.parent-create-new button:hover,
+.parent-create-new button:focus {
+  border-color: #125887;
+  color: #125887;
 }
 
 .camera-table {
-    width: 97%;
-    margin-right: auto;
-    margin-left: auto;
+  width: 97%;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .new-camera {
-    display: inline-block;
-    padding-left: 10px;
+  display: inline-block;
+  padding-left: 10px;
 }
 
 .ant-table-tbody .ant-switch.ant-switch-checked {
-    background-color: green;
+  background-color: green;
 }
 
 .ant-table-tbody tr td:last-child {
-    width: 238px;
+  width: 238px;
 }
