@@ -6,88 +6,63 @@ import "antd/dist/antd.css";
 import "./AccountManagement.css";
 import AccountManagementModal from "./AccountManagementModal";
 
-const columns = [
-  {
-    title: "No",
-    dataIndex: "no",
-    key: "no",
-  },
-  {
-    title: "Email",
-    dataIndex: "email",
-    key: "email",
-  },
-  {
-    title: "Fullname",
-    dataIndex: "fullname",
-    key: "fullname",
-  },
-  {
-    title: "Action",
-    dataIndex: "action",
-    key: "action",
-    render: (action) => (
-      <>
-        {action === "on" ? (
-          <Switch checkedChildren="On" unCheckedChildren="Off" defaultChecked />
-        ) : (
-          <Switch
-            checkedChildren="On"
-            unCheckedChildren="Off"
-            defaultChecked={false}
-          />
-        )}
-      </>
-    ),
-  },
-];
-
-const data = [
-  {
-    key: "1",
-    no: 1,
-    username: "John Brown",
-    fullname: "New York No. 1 Lake Park",
-    action: "on",
-  },
-  {
-    key: "2",
-    no: 2,
-    username: "Jim Green",
-    fullname: "London No. 1 Lake Park",
-    action: "off",
-  },
-  {
-    key: "3",
-    no: 3,
-    username: "Joe Black",
-    fullname: "Sidney No. 1 Lake Park",
-    action: "on",
-  },
-  {
-    key: "4",
-    no: 3,
-    username: "Joe Black",
-    fullname: "Sidney No. 1 Lake Park",
-    action: "on",
-  },
-  {
-    key: "5",
-    no: 3,
-    username: "Joe Black",
-    fullname: "Sidney No. 1 Lake Park",
-    action: "on",
-  },
-];
-
 class AccountManagement extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
       confirmLoading: false,
+      data: [],
     };
   }
+
+  columns = [
+    {
+      title: "No",
+      dataIndex: "no",
+      key: "no",
+    },
+    {
+      title: "Email",
+      dataIndex: "username",
+      key: "email",
+    },
+    {
+      title: "Fullname",
+      dataIndex: "fullname",
+      key: "fullname",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (text, record) => (
+        <Switch
+          style={{ width: "75px" }}
+          checkedChildren="Active"
+          unCheckedChildren="Inactive"
+          defaultChecked={record.status === "Active"}
+        />
+      ),
+    },
+  ];
+
+  fetchUsers = (value = "") => {
+    fetch(`http://localhost:8080/account/search?value=${value}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((Response) => Response.json())
+      .then((accounts) => {
+        this.setState({ data: accounts });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   showModal = () => {
     this.setState({
@@ -109,10 +84,13 @@ class AccountManagement extends React.Component {
   };
 
   handleCancel = () => {
-    console.log("Clicked cancel button");
     this.setState({
       visible: false,
     });
+  };
+
+  componentDidMount = () => {
+    this.fetchUsers();
   };
 
   render() {
@@ -130,8 +108,8 @@ class AccountManagement extends React.Component {
             <div className="camera-table">
               <Table
                 className="table"
-                columns={columns}
-                dataSource={data}
+                columns={this.columns}
+                dataSource={this.state.data}
                 pagination={{ defaultCurrent: 1, total: 10, pageSize: 10 }}
               />
             </div>

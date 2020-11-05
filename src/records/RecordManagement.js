@@ -1,7 +1,7 @@
 import * as React from "react";
 import "antd/dist/antd.css";
 import moment from "moment";
-import { Input, Table, Button, Select, DatePicker } from "antd";
+import { Table, Button, Select, DatePicker } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import "./RecordManagement.css";

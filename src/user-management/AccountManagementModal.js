@@ -8,11 +8,36 @@ class AccountManagementModal extends React.Component {
     this.state = {
       visible: false,
       confirmLoading: false,
+      info: {
+        username: "",
+        fullname: "",
+        status: "Active",
+        role: {
+          roleId: 2,
+          name: "moderator",
+        },
+      },
     };
   }
 
+  createUser = () => {
+    fetch("http://localhost:8080/account/create", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(this.state.info),
+    });
+  };
+
   onFinish = (values) => {
-    console.log("Success:", values);
+    let temp = this.state.info;
+    temp.username = values.email;
+    temp.fullname = values.fullname;
+    this.setState({ info: temp });
+    this.createUser();
+    this.props.onCancel();
   };
 
   onFinishFailed = (errorInfo) => {

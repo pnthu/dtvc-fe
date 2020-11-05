@@ -3,7 +3,7 @@ import { Modal, Button } from "antd";
 import "./RecordDetail.css";
 
 const actions = {
-  Pending: (
+  unconfirmed: (
     <>
       <Button type="default">Reject</Button>
       <Button type="primary">Approve</Button>
@@ -37,7 +37,7 @@ class RecordDetail extends React.Component {
             <p>{this.props.data.image.camera.location}</p>
             <p>{this.props.data.violationType.name}</p>
             <p>{this.props.data.licensePlate}</p>
-            <p>{this.props.data.image.camera.status}</p>
+            <p>{this.props.data.caseType}</p>
           </div>
         </div>
         <div
@@ -48,7 +48,7 @@ class RecordDetail extends React.Component {
             backgroundColor: "gray",
           }}
         ></div>
-        <div>{actions[this.props.data.status]}</div>
+        <div>{actions[this.props.data.caseType]}</div>
       </Modal>
     );
   }

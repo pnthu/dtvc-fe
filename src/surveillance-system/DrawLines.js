@@ -20,11 +20,14 @@ class DrawLines extends React.Component {
   }
 
   handleMouseDown = (evt) => {
+    console.log("top", this.state.canvasOffsetTop);
+    console.log("left", this.state.canvasOffsetLeft);
     const tmp = window.innerHeight * 0.2;
     if (this.state.context) {
       const points = this.state.points;
       const ctx = this.state.context;
       if (this.state.points.length < 2) {
+        //2 points of horizontal line
         this.setState({
           mouseDown: true,
           point: {
@@ -53,6 +56,7 @@ class DrawLines extends React.Component {
           this.setState({ currentStep: next });
         }
       } else if (this.state.points.length < 4) {
+        //2 points of vertical line
         this.setState({
           mouseDown: true,
           point: {
@@ -81,6 +85,7 @@ class DrawLines extends React.Component {
           this.setState({ currentStep: next });
         }
       } else {
+        // 2 points of the area
         this.setState({
           mouseDown: true,
           point: {
@@ -132,7 +137,7 @@ class DrawLines extends React.Component {
         const img = new Image();
         img.src = require("../test.JPG");
         img.onload = () => {
-          renderCtx.drawImage(img, 0, 0, 638, 364);
+          renderCtx.drawImage(img, 0, 0, 640, 360);
         };
       }
     }
@@ -162,8 +167,8 @@ class DrawLines extends React.Component {
         <canvas
           id="canvas"
           ref={this.canvasRef}
-          width={638}
-          height={364}
+          width={640}
+          height={360}
         ></canvas>
       </div>
     );

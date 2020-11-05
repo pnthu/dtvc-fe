@@ -11,10 +11,6 @@
   margin-top: 10px;
 }
 
-.ant-modal-content {
-  top: -60px;
-}
-
 .test-row {
   display: flex;
   justify-content: space-between;
@@ -28,7 +24,7 @@
 }
 
 .ant-modal-wrap .ant-modal .ant-modal-content {
-  border-radius: 8px 8px 8px 8px;
+  border-radius: 8px;
 }
 
 .steps {

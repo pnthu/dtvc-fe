@@ -7,6 +7,20 @@ import "./CameraManagement.css";
 import NewCameraModal from "./NewCameraModal";
 
 class CameraManagement extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      visible: false,
+      loading: false,
+      data: [],
+      locations: [],
+      selectedLocation: "",
+      selectedStatus: "Active",
+      selectedRow: {},
+    };
+    var tempRecord = {};
+  }
+
   columns = [
     {
       title: "No",
@@ -32,14 +46,22 @@ class CameraManagement extends React.Component {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (text, record) => (
-        <Switch
-          checkedChildren="Active"
-          unCheckedChildren="Inactive"
-          defaultChecked={record.status === "Active"}
-          // onChange={this.updateStatus(record)}
-        />
-      ),
+      render: (text, record) => {
+        let self = this;
+        return (
+          <Switch
+            style={{ width: "75px" }}
+            checkedChildren="Active"
+            unCheckedChildren="Inactive"
+            defaultChecked={record.status === "Active"}
+            onClick={(checked, evt) => {
+              self.tempRecord = record;
+              console.log("selectedRow", self.tempRecord);
+              self.onSwitch(checked);
+            }}
+          />
+        );
+      },
     },
     {
       title: "Update",
@@ -55,18 +77,6 @@ class CameraManagement extends React.Component {
       ),
     },
   ];
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      visible: false,
-      loading: false,
-      data: [],
-      locations: [],
-      selectedLocation: "",
-      selectedStatus: "Active",
-    };
-  }
 
   showModal = () => {
     this.setState({
@@ -149,21 +159,16 @@ class CameraManagement extends React.Component {
   };
 
   updateStatus = (record) => {
+    console.log("record", record);
     fetch("http://localhost:8080/camera/update", {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: record,
-    })
-      .then((Response) => Response.json())
-      .then((cameras) => {
-        this.setState({ data: cameras });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      body: JSON.stringify(record),
+    });
+    this.fetchCameras();
   };
 
   onSelectedLocation = (value, option) => {
@@ -176,12 +181,14 @@ class CameraManagement extends React.Component {
     this.filterByLocationStatus(this.state.selectedLocation, value);
   };
 
-  onSwitch = (text, record) => {
+  onSwitch = (checked) => {
     let newStatus;
-    if (text === "Active") {
-      newStatus = "Inactive";
-    } else {
+    let record = this.tempRecord;
+    console.log("record1", record);
+    if (checked) {
       newStatus = "Active";
+    } else {
+      newStatus = "Inactive";
     }
     record.status = newStatus;
     this.updateStatus(record);
