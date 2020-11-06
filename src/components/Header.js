@@ -3,7 +3,7 @@ import { Popover, Button } from "antd";
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
-import "./Header.css";
+import "./header.css";
 import ChangePasswordModal from "../user-management/ChangePasswordModal";
 import ChangeProfileModal from "../user-management/ChangeProfileModal";
 

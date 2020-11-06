@@ -8,8 +8,9 @@ class ChangePasswordModal extends React.Component {
       username: "",
       oldPassword: "",
       newPassword: "",
-      confirmPassword: "",
+      confirmPassword: ""
     };
+    this.formRef = React.createRef();
   }
 
   changePassword = () => {
@@ -34,6 +35,7 @@ class ChangePasswordModal extends React.Component {
             newPassword: "",
             confirmPassword: "",
           });
+          this.formRef.current.setFieldsValue({...this.state});
           this.props.onCancel();
         } else {
           notification.error({
@@ -76,6 +78,7 @@ class ChangePasswordModal extends React.Component {
           name="basic"
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFailed}
+          ref={this.formRef}
         >
           <h1 className="title-new-camera">Change Password</h1>
           <Form.Item
