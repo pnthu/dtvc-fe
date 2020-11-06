@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Modal, Button, Form, Input } from "antd";
+import { Modal, Button, Form, Input, notification } from "antd";
 
 class ChangePasswordModal extends React.Component {
   constructor(props) {
@@ -8,12 +8,13 @@ class ChangePasswordModal extends React.Component {
       username: "",
       oldPassword: "",
       newPassword: "",
+      confirmPassword: "",
     };
   }
 
-  changeProfile = () => {
+  changePassword = () => {
     fetch(
-      `http://localhost:8080/account/updateProfile?username=${this.state.username}`,
+      `http://localhost:8080/account/updatePassword?username=${this.state.username}&oldPassword=${this.state.oldPassword}&newPassword=${this.state.newPassword}`,
       {
         method: "POST",
         headers: {
@@ -21,7 +22,42 @@ class ChangePasswordModal extends React.Component {
           "Content-Type": "application/json",
         },
       }
-    );
+    )
+      .then((Response) => {
+        if (Response.status === 200) {
+          notification.success({
+            message: "Change Password Successfully!",
+            placement: "bottomLeft",
+          });
+          this.setState({
+            oldPassword: "",
+            newPassword: "",
+            confirmPassword: "",
+          });
+          this.props.onCancel();
+        } else {
+          notification.error({
+            message: "Change Password Failed!",
+            description: "Wrong current password. Please check again.",
+            placement: "bottomLeft",
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  onFinish = (values) => {
+    this.setState({
+      oldPassword: values.oldPassword,
+      newPassword: values.newPassword,
+    });
+    this.changePassword();
+  };
+
+  onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
   };
 
   componentDidMount = () => {
@@ -47,14 +83,20 @@ class ChangePasswordModal extends React.Component {
             name="oldPassword"
             rules={[{ required: true, message: "Please input old password" }]}
           >
-            <Input placeholder="Old password" />
+            <Input.Password
+              placeholder="Old password"
+              value={this.state.oldPassword}
+            />
           </Form.Item>
           <Form.Item
             label="New password"
             name="newPassword"
-            rules={[{ required: true, message: "Please input old password" }]}
+            rules={[{ required: true, message: "Please input new password" }]}
           >
-            <Input placeholder="New password" />
+            <Input.Password
+              placeholder="New password"
+              value={this.state.newPassword}
+            />
           </Form.Item>
           <Form.Item
             label="Confirm new password"
@@ -63,7 +105,10 @@ class ChangePasswordModal extends React.Component {
               { required: true, message: "Please confirm your new password" },
             ]}
           >
-            <Input placeholder="Confirm new password" />
+            <Input.Password
+              placeholder="Confirm new password"
+              value={this.state.confirmPassword}
+            />
           </Form.Item>
           <Form.Item>
             <Button

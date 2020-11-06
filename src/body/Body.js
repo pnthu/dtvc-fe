@@ -8,6 +8,7 @@ import Report from "../report/Report";
 import VideoStreaming from "../video-streaming/VideoStreamingScreen";
 import Error from "./Error";
 import Header from "../components/Header";
+import ActivateAccount from "../user-management/ActivateAccount";
 
 class Body extends React.Component {
   constructor(props) {
@@ -17,7 +18,7 @@ class Body extends React.Component {
   }
 
   login = () => {
-    window.sessionStorage.setItem("role", "moderator");
+    window.sessionStorage.setItem("role", "admin");
     this.props.history.push("/accounts");
   };
 
@@ -62,6 +63,7 @@ class Body extends React.Component {
             exact
             component={() => <Login login={this.login} />}
           />
+          <Route path="/confirm" component={ActivateAccount} />
         </Switch>
       );
     }

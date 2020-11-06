@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Modal, Button, Form, Input } from "antd";
+import { Modal, Button, Form, Input, notification } from "antd";
 
 class ChangeProfileModal extends React.Component {
   constructor(props) {
@@ -27,6 +27,10 @@ class ChangeProfileModal extends React.Component {
     this.setState({ fullname: values.fullname });
     this.changeProfile();
     this.props.onCancel();
+    notification.success({
+      message: "Change Profile Successfully!",
+      placement: "bottomLeft",
+    });
   };
 
   onFinishFailed = (errorInfo) => {

@@ -10,6 +10,7 @@ class AccountManagement extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      loading: true,
       visible: false,
       confirmLoading: false,
       data: [],
@@ -90,7 +91,9 @@ class AccountManagement extends React.Component {
   };
 
   componentDidMount = () => {
+    this.setState({ loading: true });
     this.fetchUsers();
+    this.setState({ loading: false });
   };
 
   render() {
@@ -107,6 +110,7 @@ class AccountManagement extends React.Component {
             </div>
             <div className="camera-table">
               <Table
+                loading={this.state.loading}
                 className="table"
                 columns={this.columns}
                 dataSource={this.state.data}

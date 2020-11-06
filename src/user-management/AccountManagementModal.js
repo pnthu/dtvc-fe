@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Modal, Button, Form, Input } from "antd";
+import { Modal, Button, Form, Input, notification } from "antd";
 import "./AccountManagementModal.css";
 
 class AccountManagementModal extends React.Component {
@@ -7,11 +7,10 @@ class AccountManagementModal extends React.Component {
     super(props);
     this.state = {
       visible: false,
-      confirmLoading: false,
       info: {
         username: "",
         fullname: "",
-        status: "Active",
+        status: "Pending",
         role: {
           roleId: 2,
           name: "moderator",
@@ -38,6 +37,10 @@ class AccountManagementModal extends React.Component {
     this.setState({ info: temp });
     this.createUser();
     this.props.onCancel();
+    notification.success({
+      message: "Created Successfully!",
+      placement: "bottomLeft",
+    });
   };
 
   onFinishFailed = (errorInfo) => {
@@ -46,42 +49,43 @@ class AccountManagementModal extends React.Component {
 
   render() {
     return (
-      <Modal
-        visible={this.props.visible}
-        onOk={this.props.handleOk}
-        confirmLoading={this.props.confirmLoading}
-        onCancel={this.props.onCancel}
-        footer={false}
-        className="create-modal"
-      >
-        <h1 className="title-new-camera">New Account</h1>
-        <Form
-          layout="vertical"
-          name="basic"
-          onFinish={this.onFinish}
-          onFinishFailed={this.onFinishFailed}
+      <>
+        <Modal
+          visible={this.props.visible}
+          onOk={this.props.handleOk}
+          onCancel={this.props.onCancel}
+          footer={false}
+          className="create-modal"
         >
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[{ required: true, message: "Please input email" }]}
+          <h1 className="title-new-camera">New Account</h1>
+          <Form
+            layout="vertical"
+            name="basic"
+            onFinish={this.onFinish}
+            onFinishFailed={this.onFinishFailed}
           >
-            <Input type="email" placeholder="Email" />
-          </Form.Item>
-          <Form.Item
-            label="Fullname"
-            name="fullname"
-            rules={[{ required: true, message: "Please input fullname" }]}
-          >
-            <Input placeholder="Fullname" />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className="login">
-              Create
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[{ required: true, message: "Please input email" }]}
+            >
+              <Input type="email" placeholder="Email" />
+            </Form.Item>
+            <Form.Item
+              label="Fullname"
+              name="fullname"
+              rules={[{ required: true, message: "Please input fullname" }]}
+            >
+              <Input placeholder="Fullname" />
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" className="login">
+                Create
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
+      </>
     );
   }
 }
