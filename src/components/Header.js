@@ -9,10 +9,10 @@ import ChangeProfileModal from "../user-management/ChangeProfileModal";
 
 const permissions = {
   moderator: [
-    { link: "/streaming", name: "Video Streaming" },
-    { link: "/cameras", name: "Surveillance System" },
-    { link: "/records", name: "Records" },
     { link: "/report", name: "Report" },
+    { link: "/records", name: "Records" },
+    { link: "/cameras", name: "Surveillance System" },
+    { link: "/streaming", name: "Video Streaming" },
   ],
   admin: [{ link: "/accounts", name: "Account Management" }],
 };
@@ -69,6 +69,12 @@ class Header extends React.Component {
             />
           </div>
           <div className="right">
+            <div className="headerRight">
+              <Popover content={content} placement="bottomRight">
+                <FontAwesomeIcon icon={faChevronDown} />
+              </Popover>
+              <div>Hello, User</div>
+            </div>
             {permissions[this.props.role] instanceof Array &&
               permissions[this.props.role].map((permission) => {
                 return (
@@ -80,12 +86,6 @@ class Header extends React.Component {
                   </NavLink>
                 );
               })}
-            <div className="headerRight">
-              <div>Hello, User</div>
-              <Popover content={content} placement="bottomRight">
-                <FontAwesomeIcon icon={faChevronDown} />
-              </Popover>
-            </div>
           </div>
         </nav>
         <ChangePasswordModal

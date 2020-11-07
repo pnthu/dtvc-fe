@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Table, Switch, Select } from "antd";
+import { Button, Table, Switch, Select, notification } from "antd";
 import { faPlus, faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "antd/dist/antd.css";
@@ -18,7 +18,6 @@ class CameraManagement extends React.Component {
       selectedStatus: "Active",
       selectedRow: {},
     };
-    var tempRecord = {};
   }
 
   columns = [
@@ -53,10 +52,9 @@ class CameraManagement extends React.Component {
             style={{ width: "75px" }}
             checkedChildren="Active"
             unCheckedChildren="Inactive"
-            defaultChecked={record.status === "Active"}
+            checked={record.status === "Active"}
             onClick={(checked, evt) => {
               self.tempRecord = record;
-              console.log("selectedRow", self.tempRecord);
               self.onSwitch(checked);
             }}
           />
@@ -84,21 +82,7 @@ class CameraManagement extends React.Component {
     });
   };
 
-  handleOk = () => {
-    this.setState({
-      ModalText: "Creating new camera",
-      confirmLoading: true,
-    });
-    setTimeout(() => {
-      this.setState({
-        visible: false,
-        confirmLoading: false,
-      });
-    }, 2000);
-  };
-
   handleCancel = () => {
-    console.log("Clicked cancel button");
     this.setState({
       visible: false,
     });
@@ -158,15 +142,41 @@ class CameraManagement extends React.Component {
       });
   };
 
-  updateStatus = (record) => {
-    console.log("record", record);
-    fetch("http://localhost:8080/camera/update", {
+  updateStatus = async (record) => {
+    const status = record.status;
+    await fetch("http://localhost:8080/camera/update", {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(record),
+    }).then((Response) => {
+      if (status === "Active") {
+        if (Response.status === 200) {
+          notification.success({
+            message: "Activate Camera Successfully!",
+            placement: "bottomLeft",
+          });
+        } else {
+          notification.error({
+            message: "Activate Camera Failed!",
+            placement: "bottomLeft",
+          });
+        }
+      } else {
+        if (Response.status === 200) {
+          notification.success({
+            message: "Deactivate Camera Successfully!",
+            placement: "bottomLeft",
+          });
+        } else {
+          notification.error({
+            message: "Deactivate Camera Failed!",
+            placement: "bottomLeft",
+          });
+        }
+      }
     });
     this.fetchCameras();
   };
@@ -181,17 +191,16 @@ class CameraManagement extends React.Component {
     this.filterByLocationStatus(this.state.selectedLocation, value);
   };
 
-  onSwitch = (checked) => {
+  onSwitch = async (checked) => {
     let newStatus;
     let record = this.tempRecord;
-    console.log("record1", record);
     if (checked) {
       newStatus = "Active";
     } else {
       newStatus = "Inactive";
     }
     record.status = newStatus;
-    this.updateStatus(record);
+    await this.updateStatus(record);
   };
 
   componentDidMount = () => {
@@ -253,9 +262,8 @@ class CameraManagement extends React.Component {
           </div>
         </div>
         <NewCameraModal
-          handleOk={this.handleOk}
           visible={this.state.visible}
-          confirmLoading={this.state.confirmLoading}
+          s
           onCancel={this.handleCancel}
         />
       </>

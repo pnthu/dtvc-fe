@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Table, Switch } from "antd";
+import { Button, Table, Switch, Input, Select, notification } from "antd";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "antd/dist/antd.css";
@@ -19,11 +19,6 @@ class AccountManagement extends React.Component {
 
   columns = [
     {
-      title: "No",
-      dataIndex: "no",
-      key: "no",
-    },
-    {
       title: "Email",
       dataIndex: "username",
       key: "email",
@@ -37,14 +32,21 @@ class AccountManagement extends React.Component {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (text, record) => (
-        <Switch
-          style={{ width: "75px" }}
-          checkedChildren="Active"
-          unCheckedChildren="Inactive"
-          defaultChecked={record.status === "Active"}
-        />
-      ),
+      render: (text, record) => {
+        let self = this;
+        return (
+          <Switch
+            style={{ width: "75px" }}
+            checkedChildren="Active"
+            unCheckedChildren="Inactive"
+            checked={record.status === "Active"}
+            onClick={(checked, evt) => {
+              self.tempRecord = record;
+              self.onSwitch(checked);
+            }}
+          />
+        );
+      },
     },
   ];
 
@@ -65,29 +67,99 @@ class AccountManagement extends React.Component {
       });
   };
 
+  filterByNameAndStatus = (status = "", name = "") => {
+    fetch(
+      `http://localhost:8080/account/filterByStatusAndName?status=${status}&fullname=${name}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((Response) => Response.json())
+      .then((accounts) => {
+        this.setState({ data: accounts });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  updateStatus = async (record) => {
+    const status = record.status;
+    await fetch(
+      `http://localhost:8080/account/updateStatus?username=${record.username}&status=${record.status}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(record),
+      }
+    ).then((Response) => {
+      if (status === "Active") {
+        if (Response.status === 200) {
+          notification.success({
+            message: "Activate Account Successfully!",
+            placement: "bottomLeft",
+          });
+        } else {
+          notification.error({
+            message: "Activate Account Failed!",
+            placement: "bottomLeft",
+          });
+        }
+      } else {
+        if (Response.status === 200) {
+          notification.success({
+            message: "Deactivate Account Successfully!",
+            placement: "bottomLeft",
+          });
+        } else {
+          notification.error({
+            message: "Deactivate Account Failed!",
+            placement: "bottomLeft",
+          });
+        }
+      }
+    });
+    this.fetchUsers();
+  };
+
   showModal = () => {
     this.setState({
       visible: true,
     });
   };
 
-  handleOk = () => {
-    this.setState({
-      ModalText: "Creating new camera",
-      confirmLoading: true,
-    });
-    setTimeout(() => {
-      this.setState({
-        visible: false,
-        confirmLoading: false,
-      });
-    }, 2000);
-  };
-
   handleCancel = () => {
     this.setState({
       visible: false,
     });
+  };
+
+  onSearch = (value) => {
+    this.filterByNameAndStatus("", value);
+  };
+
+  onSelectedStatus = (value, option) => {
+    this.filterByNameAndStatus(value);
+  };
+
+  onSwitch = async (checked) => {
+    let newStatus;
+    let record = this.tempRecord;
+    if (checked) {
+      newStatus = "Active";
+    } else {
+      newStatus = "Inactive";
+    }
+    record.status = newStatus;
+    await this.updateStatus(record);
+    window.location.reload();
   };
 
   componentDidMount = () => {
@@ -102,27 +174,42 @@ class AccountManagement extends React.Component {
         <div className="background">
           <div className="box">
             <h2 className="title">Account Management</h2>
-            <div className="parent-create-new">
-              <Button onClick={this.showModal}>
-                <FontAwesomeIcon icon={faPlus} />
-                <span className="new-camera">New Account</span>
-              </Button>
+            <div className="top-row">
+              <div className="camera-filter">
+                <Input.Search
+                  placeholder="Fullname"
+                  style={{ width: "50%" }}
+                  onSearch={this.onSearch}
+                />
+                <Select
+                  defaultValue=""
+                  placeholder="Status"
+                  style={{ width: "40%" }}
+                  onChange={this.onSelectedStatus}
+                >
+                  <Select.Option value="">All Status</Select.Option>
+                  <Select.Option value="Active">Active</Select.Option>
+                  <Select.Option value="Inactive">Inactive</Select.Option>
+                </Select>
+              </div>
+              <div className="new-btn">
+                <Button onClick={this.showModal}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  <span className="new-camera">New Account</span>
+                </Button>
+              </div>
             </div>
-            <div className="camera-table">
-              <Table
-                loading={this.state.loading}
-                className="table"
-                columns={this.columns}
-                dataSource={this.state.data}
-                pagination={{ defaultCurrent: 1, total: 10, pageSize: 10 }}
-              />
-            </div>
+            <Table
+              loading={this.state.loading}
+              className="table"
+              columns={this.columns}
+              dataSource={this.state.data}
+              pagination={{ pageSize: 10 }}
+            />
           </div>
         </div>
         <AccountManagementModal
-          handleOk={this.handleOk}
           visible={this.state.visible}
-          confirmLoading={this.state.confirmLoading}
           onCancel={this.handleCancel}
         />
       </>
