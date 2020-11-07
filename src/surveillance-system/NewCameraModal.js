@@ -24,7 +24,7 @@ class NewCameraModal extends React.Component {
   render() {
     return (
       <Drawer
-        height="80vh"
+        height="85vh"
         placement="bottom"
         title="Create a new camera"
         onClose={this.props.onCancel}
