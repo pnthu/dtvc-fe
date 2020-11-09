@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Drawer, Steps, Button, Form, Input } from "antd";
+import { Drawer, Steps, Button, Form, Input, AutoComplete, Select } from "antd";
 import "./NewCameraModal.css";
 import DrawLines from "./DrawLines";
 
@@ -8,17 +8,84 @@ class NewCameraModal extends React.Component {
     super(props);
     this.state = {
       current: 0,
+      data: null,
+      groups: [],
+      selectedGroup: [],
+      positions: [],
+      groupText: "",
+      existedPosition: null,
     };
   }
 
-  next = () => {
+  fetchGroupByName = (value = "") => {
+    fetch(`http://localhost:8080/camera/searchGroupByName?value=${value}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((Response) => Response.json())
+      .then((groups) => {
+        this.setState({ groups: groups });
+        if (groups === null) {
+          this.setState({ groupText: value });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  getGroup = (id) => {
+    fetch(`http://localhost:8080/camera/getByGroup?groupId=${id}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((Response) => Response.json())
+      .then((group) => {
+        if (group instanceof Array && group.length !== 0) {
+          this.setState({ existedPosition: group[0].position });
+        } else {
+          this.setState({ existedPosition: null });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  onFinish = (values) => {
     const next = this.state.current + 1;
-    this.setState({ current: next });
+    const info = values;
+    info.status = "Active";
+    info.groupCamera = this.state.selectedGroup;
+    this.setState({ current: next, data: info });
+  };
+
+  onSelectedGroup = (value, option) => {
+    if (typeof value === "number") {
+      this.state.groups.forEach((group) => {
+        if (group.groupId === value) {
+          this.setState({ selectedGroup: group });
+        }
+      });
+      this.getGroup(value);
+    } else {
+      this.setState({ selectedGroup: { groupId: 0, groupName: value } });
+    }
   };
 
   prev = () => {
     const prev = this.state.current - 1;
     this.setState({ current: prev });
+  };
+
+  componentDidMount = () => {
+    this.fetchGroupByName();
   };
 
   render() {
@@ -29,21 +96,6 @@ class NewCameraModal extends React.Component {
         title="Create a new camera"
         onClose={this.props.onCancel}
         visible={this.props.visible}
-        footer={
-          <div style={{ textAlign: "right" }}>
-            {this.state.current === 0 && (
-              <Button onClick={this.next} type="primary">
-                Next
-              </Button>
-            )}
-            {this.state.current === 1 && (
-              <>
-                <Button onClick={this.prev}>Previous</Button>{" "}
-                <Button type="primary">Create</Button>
-              </>
-            )}
-          </div>
-        }
       >
         <div className="steps">
           <Steps current={this.state.current}>
@@ -52,17 +104,12 @@ class NewCameraModal extends React.Component {
           </Steps>
         </div>
         {this.state.current === 0 && (
-          <Form onFinish={this.onFinish} onFinishFailed={this.onFinishFailed}>
+          <Form
+            name="basic"
+            onFinish={this.onFinish}
+            initialValues={this.state.data}
+          >
             <div className="camera-form">
-              <Form.Item
-                label="Name"
-                name="name"
-                rules={[
-                  { required: true, message: "Please input camera name" },
-                ]}
-              >
-                <Input placeholder="Name" />
-              </Form.Item>
               <Form.Item
                 label="Location"
                 name="location"
@@ -73,13 +120,33 @@ class NewCameraModal extends React.Component {
                 <Input placeholder="Location" />
               </Form.Item>
               <Form.Item
+                label="URL"
+                name="connectionUrl"
+                rules={[{ required: true, message: "Please input camera URL" }]}
+              >
+                <Input placeholder="Camera URL" />
+              </Form.Item>
+              <Form.Item
                 label="Group"
-                name="group"
+                name="groupCamera"
                 rules={[
                   { required: true, message: "Please input camera group" },
                 ]}
               >
-                <Input placeholder="Group" />
+                <AutoComplete
+                  onSearch={this.fetchGroupByName}
+                  onChange={this.onSelectedGroup}
+                  style={{ textAlign: "left" }}
+                  placeholder="Group"
+                >
+                  {this.state.groups &&
+                    this.state.groups.length !== 0 &&
+                    this.state.groups.map((group) => (
+                      <AutoComplete.Option value={group.groupId}>
+                        {group.groupName}
+                      </AutoComplete.Option>
+                    ))}
+                </AutoComplete>
               </Form.Item>
               <Form.Item
                 label="Position"
@@ -88,19 +155,34 @@ class NewCameraModal extends React.Component {
                   { required: true, message: "Please input camera position" },
                 ]}
               >
-                <Input placeholder="Position" />
+                <Select placeholder="Position" style={{ textAlign: "left" }}>
+                  {this.state.existedPosition === null ? (
+                    <>
+                      <Select.Option value="Left">Left</Select.Option>
+                      <Select.Option value="Right">Right</Select.Option>
+                    </>
+                  ) : this.state.existedPosition === "Left" ? (
+                    <Select.Option value="Left">Right</Select.Option>
+                  ) : (
+                    <Select.Option value="Left">Left</Select.Option>
+                  )}
+                </Select>
               </Form.Item>
-              <Form.Item
-                label="URL"
-                name="url"
-                rules={[{ required: true, message: "Please input camera URL" }]}
-              >
-                <Input placeholder="Camera URL" />
-              </Form.Item>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <Button htmlType="submit" type="primary">
+                Next
+              </Button>
             </div>
           </Form>
         )}
-        {this.state.current === 1 && <DrawLines />}
+        {this.state.current === 1 && (
+          <DrawLines
+            prev={this.prev}
+            data={this.state.data}
+            onCancel={this.props.onCancel}
+          />
+        )}
       </Drawer>
     );
   }

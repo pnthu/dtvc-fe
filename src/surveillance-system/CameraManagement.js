@@ -15,7 +15,7 @@ class CameraManagement extends React.Component {
       data: [],
       locations: [],
       selectedLocation: "",
-      selectedStatus: "Active",
+      selectedStatus: "",
       selectedRow: {},
     };
   }
@@ -236,11 +236,12 @@ class CameraManagement extends React.Component {
                     ))}
                 </Select>
                 <Select
-                  defaultValue="Active"
+                  defaultValue=""
                   placeholder="Status"
                   style={{ width: "40%" }}
                   onChange={this.onSelectedStatus}
                 >
+                  <Select.Option value="">All Status</Select.Option>
                   <Select.Option value="Active">Active</Select.Option>
                   <Select.Option value="Inactive">Inactive</Select.Option>
                 </Select>
@@ -263,7 +264,6 @@ class CameraManagement extends React.Component {
         </div>
         <NewCameraModal
           visible={this.state.visible}
-          s
           onCancel={this.handleCancel}
         />
       </>

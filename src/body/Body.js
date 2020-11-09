@@ -18,8 +18,8 @@ class Body extends React.Component {
   }
 
   login = () => {
-    window.sessionStorage.setItem("role", "admin");
-    this.props.history.push("/accounts");
+    window.sessionStorage.setItem("role", "moderator");
+    this.props.history.push("/streaming");
   };
 
   logout = () => {

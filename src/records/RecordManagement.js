@@ -4,7 +4,7 @@ import moment from "moment";
 import { Table, Button, Select, DatePicker } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
-import "./recordManagement.css";
+import "./RecordManagement.css";
 import RecordDetail from "./RecordDetail";
 
 class RecordManagement extends React.Component {
@@ -13,7 +13,7 @@ class RecordManagement extends React.Component {
     this.state = {
       visible: false,
       record: {
-        image: { camera: { location: "", status: "" } },
+        image: { camera: { location: "" } },
         violationType: { name: "" },
       },
       data: [],
@@ -62,6 +62,18 @@ class RecordManagement extends React.Component {
       title: "Status",
       dataIndex: "caseType",
       key: "status",
+      render: (text) => {
+        const titleCase = (str) => {
+          return str
+            .toLowerCase()
+            .split(" ")
+            .map((word) => {
+              return word.replace(word[0], word[0].toUpperCase());
+            })
+            .join(" ");
+        };
+        return titleCase(text);
+      },
     },
     {
       title: "View Details",
@@ -84,24 +96,6 @@ class RecordManagement extends React.Component {
       ),
     },
   ];
-
-  showModal = () => {
-    this.setState({ visible: true });
-  };
-
-  handleApprove = () => {
-    //approve code here
-    this.setState({ visible: false });
-  };
-
-  handleReject = () => {
-    //reject code here
-    this.setState({ visible: false });
-  };
-
-  onClose = () => {
-    this.setState({ visible: false });
-  };
 
   fetchAllCases = () => {
     fetch("http://localhost:8080/case/getAll", {
@@ -188,9 +182,17 @@ class RecordManagement extends React.Component {
     this.filter(from, to, this.state.selectedType, this.state.selectedStatus);
   };
 
+  showModal = () => {
+    this.setState({ visible: true });
+  };
+
+  onClose = () => {
+    this.setState({ visible: false });
+  };
+
   componentDidMount = () => {
-    this.fetchAllCases();
     this.fetchViolationTypes();
+    this.fetchAllCases();
   };
 
   render() {
@@ -207,8 +209,10 @@ class RecordManagement extends React.Component {
               />
               <Select
                 placeholder="Violation Type"
+                defaultValue=""
                 onChange={this.onSelectedType}
               >
+                <Select.Option value="">All types</Select.Option>
                 {this.state.types.map((type) => (
                   <Select.Option
                     key={type.violationId}
@@ -218,8 +222,12 @@ class RecordManagement extends React.Component {
                   </Select.Option>
                 ))}
               </Select>
-              <Select placeholder="Status">
-                <Select.Option value="unconfirmed">Pending</Select.Option>
+              <Select
+                placeholder="Status"
+                defaultValue="unconfirmed"
+                onChange={this.onSelectedStatus}
+              >
+                <Select.Option value="unconfirmed">Unconfirmed</Select.Option>
                 <Select.Option value="punishment">Approved</Select.Option>
                 <Select.Option value="rejected">Rejected</Select.Option>
               </Select>

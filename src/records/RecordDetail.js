@@ -1,55 +1,259 @@
 import * as React from "react";
-import { Modal, Button } from "antd";
+import { Modal, Button, Form, Input, notification } from "antd";
+import moment from "moment";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import "./RecordDetail.css";
 
-const actions = {
-  unconfirmed: (
-    <>
-      <Button type="default">Reject</Button>
-      <Button type="primary">Approve</Button>
-    </>
-  ),
-  Approved: <Button type="primary">Export to PDF</Button>,
-  Rejected: null,
+const MODE = {
+  VIEW: "view",
+  EDIT: "edit",
 };
 
 class RecordDetail extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      mode: MODE.VIEW,
+      confirmVisible: false,
+    };
+  }
+
+  approveCase = () => {
+    fetch(
+      `http://localhost:8080/case/approve?caseId=${this.props.data.caseId}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((Response) => {
+      if (Response.status === 200) {
+        notification.success({
+          message: "Approve case succcessfully!",
+          placement: "bottomLeft",
+        });
+      } else {
+        notification.error({
+          message: "Approve case failed!",
+          placement: "bottomLeft",
+        });
+      }
+    });
+  };
+
+  rejectCase = () => {
+    fetch(
+      `http://localhost:8080/case/reject?caseId=${this.props.data.caseId}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((Response) => {
+      if (Response.status === 200) {
+        notification.success({
+          message: "Reject case succcessfully!",
+          placement: "bottomLeft",
+        });
+      } else {
+        notification.error({
+          message: "Reject case failed!",
+          placement: "bottomLeft",
+        });
+      }
+    });
+  };
+
+  updateLicense = (number) => {
+    fetch(
+      `http://localhost:8080/case/update?caseId=${this.props.data.caseId}&licensePlate=${number}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((Response) => {
+      if (Response.status === 200) {
+        notification.success({
+          message: "Update license plate number succcessfully!",
+          placement: "bottomLeft",
+        });
+      } else {
+        notification.error({
+          message: "Update license plate failed!",
+          placement: "bottomLeft",
+        });
+      }
+    });
+  };
+
+  handleApprove = () => {
+    this.approveCase();
+    this.props.onClose();
+    window.location.reload();
+  };
+
+  handleReject = () => {
+    this.approveCase();
+    this.props.onClose();
+    window.location.reload();
+  };
+
+  handleUpdate = (values) => {
+    this.updateLicense(values.license);
+    window.location.reload();
+  };
+
+  openConfirm = () => {
+    this.setState({ confirmVisible: true });
+  };
+
+  closeConfirm = () => {
+    this.setState({ confirmVisible: false });
+  };
+
+  actions = {
+    unconfirmed: (
+      <div style={{ textAlign: "right" }}>
+        <Button
+          type="default"
+          style={{ marginRight: "24px" }}
+          onClick={this.handleReject}
+        >
+          Reject
+        </Button>
+        <Button type="primary" onClick={this.handleApprove}>
+          Approve
+        </Button>
+      </div>
+    ),
+    punishment: (
+      <div style={{ textAlign: "right" }}>
+        <a
+          href="C:\Users\ASUS\Desktop\dtvc-be\Violation1.pdf"
+          target="_blank"
+          download
+        >
+          <Button type="primary">Export to PDF</Button>
+        </a>
+      </div>
+    ),
+    rejected: null,
+  };
+
+  titleCase = (str) => {
+    return str
+      .toLowerCase()
+      .split(" ")
+      .map((word) => {
+        return word.replace(word[0], word[0].toUpperCase());
+      })
+      .join(" ");
+  };
+
   render() {
     console.log("data", this.props);
     return (
-      <Modal
-        visible={this.props.visible}
-        footer={null}
-        className="detail-modal"
-        onCancel={this.props.onClose}
-      >
-        <h3 className="title">VIOLATION RECORD</h3>
-        <div className="container">
-          <div>
-            <p className="label">Time</p>
-            <p className="label">Location</p>
-            <p className="label">Violation Type</p>
-            <p className="label">License Plate Number</p>
-            <p className="label">Status</p>
+      <>
+        <Modal
+          visible={this.props.visible}
+          footer={false}
+          className="detail-modal"
+          onCancel={this.props.onClose}
+        >
+          <h3 className="title">VIOLATION RECORD</h3>
+          <div className="container">
+            <div>
+              <p className="label">Time</p>
+              <p className="label">Location</p>
+              <p className="label">Violation Type</p>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <p className="label">License Plate Number</p>
+                <Button
+                  style={{ marginBottom: "14px" }}
+                  onClick={() => this.setState({ mode: MODE.EDIT })}
+                  type="text"
+                >
+                  <FontAwesomeIcon icon={faEdit} />
+                </Button>
+              </div>
+              <p
+                className="label"
+                style={{
+                  marginTop: this.state.mode === MODE.EDIT ? "45px" : "0px",
+                }}
+              >
+                Status
+              </p>
+            </div>
+            <div className="modalRight">
+              <p>{moment(this.props.data.createdDate).format("DD/MM/yyyy")}</p>
+              <p>{this.props.data.image.camera.location}</p>
+              <p>{this.props.data.violationType.name}</p>
+              {this.state.mode === MODE.VIEW ? (
+                <p>{this.props.data.licensePlate}</p>
+              ) : (
+                <Form
+                  name="basic"
+                  initialValues={{ license: this.props.data.licensePlate }}
+                  onFinish={this.handleUpdate}
+                >
+                  <Form.Item name="license" style={{ marginBottom: "14px" }}>
+                    <Input
+                      placeholder="License plate number"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input license plate number",
+                        },
+                      ]}
+                    />
+                  </Form.Item>
+                  <Button
+                    type="default"
+                    style={{ margin: "0px 24px 14px 0px" }}
+                    onClick={() => this.setState({ mode: MODE.VIEW })}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="primary" htmlType="submit">
+                    Update
+                  </Button>
+                </Form>
+              )}
+
+              <p>
+                {this.props.data.caseType &&
+                  this.titleCase(this.props.data.caseType)}
+              </p>
+            </div>
           </div>
-          <div className="modalRight">
-            <p>{this.props.data.createdDate}</p>
-            <p>{this.props.data.image.camera.location}</p>
-            <p>{this.props.data.violationType.name}</p>
-            <p>{this.props.data.licensePlate}</p>
-            <p>{this.props.data.caseType}</p>
-          </div>
-        </div>
-        <div
-          style={{
-            width: "100%",
-            height: "300px",
-            margin: "36px 0px 24px 0px",
-            backgroundColor: "gray",
-          }}
-        ></div>
-        <div>{actions[this.props.data.caseType]}</div>
-      </Modal>
+          <img
+            src={this.props.data.image.url}
+            alt="Record"
+            width={533}
+            height={300}
+            style={{ marginBottom: "24px" }}
+          />
+          <div>{this.actions[this.props.data.caseType]}</div>
+        </Modal>
+        <Modal visible={this.state.confirmVisible}>
+          <h3 className="title">VIOLATION RECORD</h3>
+        </Modal>
+      </>
     );
   }
 }
