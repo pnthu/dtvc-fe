@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Drawer, Steps, Button, Form, Input, Select } from "antd";
+import { Drawer, Steps, Button, Form, Input, Select, Cascader } from "antd";
 // import DrawLines from "./DrawLines";
 
 class UpdateCameraModal extends React.Component {
@@ -13,8 +13,10 @@ class UpdateCameraModal extends React.Component {
       positions: [],
       groupText: "",
       existedPosition: null,
-      existedGroup: true,
+      existedGroup: true, 
+      groupCamera: null
     };
+    this.formRef = React.createRef();
   }
 
   fetchGroupByName = (value = "") => {
@@ -69,8 +71,11 @@ class UpdateCameraModal extends React.Component {
       })
         .then((Response) => Response.json())
         .then((camera) => {
-          this.setState({ data: camera });
-          console.log("camera", camera);
+          let copyCamera = {};
+          copyCamera = Object.assign({}, camera);
+          delete copyCamera.groupCamera
+          this.setState({ data: copyCamera, existedPosition: camera.position, groupCamera: camera.groupCamera });
+          this.formRef.current.setFieldsValue({...this.state.data, groupCamera: camera.groupCamera.groupId });
         })
         .catch((error) => {
           console.log(error);
@@ -123,6 +128,7 @@ class UpdateCameraModal extends React.Component {
   };
 
   render() {
+
     return (
       <Drawer
         height="85vh"
@@ -142,7 +148,10 @@ class UpdateCameraModal extends React.Component {
             <Form
               name="basic"
               onFinish={this.onFinish}
-              initialValues={this.state.data}
+              ref={this.formRef}
+              initialValues={{
+                groupCamera: this.state.groupCamera ? this.state.groupCamera.groupId : ''
+              }}
             >
               <div className="camera-form">
                 <Form.Item
@@ -177,6 +186,7 @@ class UpdateCameraModal extends React.Component {
                       onChange={this.onSelectedGroup}
                       style={{ textAlign: "left" }}
                       placeholder="Group"
+                      defaultValue={this.state.groupCamera ? this.state.groupCamera.groupId : ''}
                     >
                       {this.state.groups &&
                         this.state.groups.length !== 0 &&
@@ -184,7 +194,13 @@ class UpdateCameraModal extends React.Component {
                           <Select.Option value={group.groupId}>
                             {group.groupName}
                           </Select.Option>
-                        ))}
+                      ))}
+                      {
+                        this.state.groupCamera ? 
+                        <Select.Option value={this.state.groupCamera.groupId}>
+                          {this.state.groupCamera.groupName}
+                        </Select.Option> : null
+                      }
                     </Select>
                   ) : (
                     <Input placeholder="Group" />
@@ -203,8 +219,8 @@ class UpdateCameraModal extends React.Component {
                         <Select.Option value="Left">Left</Select.Option>
                         <Select.Option value="Right">Right</Select.Option>
                       </>
-                    ) : this.state.existedPosition === "Left" ? (
-                      <Select.Option value="Left">Right</Select.Option>
+                    ) : this.state.existedPosition === "left" ? (
+                      <Select.Option value="Right">Right</Select.Option>
                     ) : (
                       <Select.Option value="Left">Left</Select.Option>
                     )}
