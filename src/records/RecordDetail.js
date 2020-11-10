@@ -137,7 +137,7 @@ class RecordDetail extends React.Component {
     punishment: (
       <div style={{ textAlign: "right" }}>
         <a
-          href="C:\Users\ASUS\Desktop\dtvc-be\Violation1.pdf"
+          href="https://firebasestorage.googleapis.com/v0/b/capstone-dtv.appspot.com/o/reports%2FViolation5.pdf?alt=media&token=7ba7a939-9a28-465f-bfe0-7f57e9f8cca0&fbclid=IwAR24cI4NUBXY5eOWs3m-j0B6mXb-KbXHfkh_vK4pxCBVueAYRdTkTN1XB3g"
           target="_blank"
           download
         >

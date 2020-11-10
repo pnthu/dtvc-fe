@@ -3,6 +3,7 @@
   padding: 40px 30px;
   display: flex;
   justify-content: center;
+  height: 100%;
 }
 
 .box {

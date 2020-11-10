@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "antd/dist/antd.css";
 import "./CameraManagement.css";
 import NewCameraModal from "./NewCameraModal";
+import UpdateCameraModal from "./UpdateCameraModal";
 
 class CameraManagement extends React.Component {
   constructor(props) {
@@ -17,6 +18,8 @@ class CameraManagement extends React.Component {
       selectedLocation: "",
       selectedStatus: "",
       selectedRow: {},
+      updateVisible: false,
+      cameraId: -1,
     };
   }
 
@@ -66,7 +69,13 @@ class CameraManagement extends React.Component {
       dataIndex: "update",
       key: "update",
       render: (text, record) => (
-        <Button type="primary" className="detail" onClick={() => {}}>
+        <Button
+          type="primary"
+          className="detail"
+          onClick={() => {
+            this.setState({ updateVisible: true, cameraId: record.cameraId });
+          }}
+        >
           <FontAwesomeIcon
             icon={faEdit}
             style={{ fontSize: 17, alignSelf: "center" }}
@@ -85,6 +94,12 @@ class CameraManagement extends React.Component {
   handleCancel = () => {
     this.setState({
       visible: false,
+    });
+  };
+
+  handleUpdateCancel = () => {
+    this.setState({
+      updateVisible: false,
     });
   };
 
@@ -178,10 +193,14 @@ class CameraManagement extends React.Component {
         }
       }
     });
+    this.setState({ selectedLocation: "", selectedStatus: "" });
     this.fetchCameras();
   };
 
   onSelectedLocation = (value, option) => {
+    if (value === undefined) {
+      value = "";
+    }
     this.setState({ selectedLocation: value });
     this.filterByLocationStatus(value, this.state.selectedStatus);
   };
@@ -220,6 +239,7 @@ class CameraManagement extends React.Component {
               <div className="camera-filter">
                 <Select
                   showSearch
+                  allowClear
                   placeholder="Location"
                   style={{ width: "50%" }}
                   onSearch={this.searchLocation}
@@ -265,6 +285,11 @@ class CameraManagement extends React.Component {
         <NewCameraModal
           visible={this.state.visible}
           onCancel={this.handleCancel}
+        />
+        <UpdateCameraModal
+          visible={this.state.updateVisible}
+          cameraId={this.state.cameraId}
+          onCancel={this.handleUpdateCancel}
         />
       </>
     );

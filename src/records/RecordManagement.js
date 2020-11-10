@@ -20,8 +20,8 @@ class RecordManagement extends React.Component {
       types: [],
       selectedType: "",
       selectedStatus: "",
-      fromDate: "",
-      toDate: "",
+      fromDate: moment().startOf("isoWeek").format("yyyy-MM-DD"),
+      toDate: moment().endOf("isoWeek").format("yyyy-MM-DD"),
     };
   }
 
@@ -131,7 +131,12 @@ class RecordManagement extends React.Component {
       });
   };
 
-  filter = (from = "", to = "", violationType = 1, caseType = "") => {
+  filter = (
+    from = moment().startOf("isoWeek").format("yyyy-MM-DD"),
+    to = moment().endOf("isoWeek").format("yyyy-MM-DD"),
+    violationType = "",
+    caseType = ""
+  ) => {
     fetch(
       `http://localhost:8080/case/filter?fromDate=${from}&toDate=${to}&violationId=${violationType}&caseType=${caseType}`,
       {
@@ -144,10 +149,13 @@ class RecordManagement extends React.Component {
     )
       .then((Response) => Response.json())
       .then((cases) => {
-        this.setState({ data: cases });
+        if (cases !== null) {
+          this.setState({ data: cases });
+        }
       })
       .catch((error) => {
-        console.log(error);
+        console.log("error", error);
+        this.setState({ data: null });
       });
   };
 
@@ -172,14 +180,15 @@ class RecordManagement extends React.Component {
   };
 
   onSelectedDates = (dates, dateStrings) => {
-    console.log("dates", dates);
-    const from = moment(dates[0]).format("yyyy-MM-DD");
-    const to = moment(dates[1]).format("yyyy-MM-DD");
-    this.setState({
-      fromDate: from,
-      toDate: to,
-    });
-    this.filter(from, to, this.state.selectedType, this.state.selectedStatus);
+    if (dates) {
+      const from = moment(dates[0]).format("yyyy-MM-DD");
+      const to = moment(dates[1]).format("yyyy-MM-DD");
+      this.setState({
+        fromDate: from,
+        toDate: to,
+      });
+      this.filter(from, to, this.state.selectedType, this.state.selectedStatus);
+    }
   };
 
   showModal = () => {
@@ -192,7 +201,8 @@ class RecordManagement extends React.Component {
 
   componentDidMount = () => {
     this.fetchViolationTypes();
-    this.fetchAllCases();
+    // this.fetchAllCases();
+    this.filter();
   };
 
   render() {
@@ -206,6 +216,10 @@ class RecordManagement extends React.Component {
                 placeholder={["From", "To"]}
                 format="DD/MM/yyyy"
                 onChange={this.onSelectedDates}
+                defaultValue={[
+                  moment().startOf("isoWeek"),
+                  moment().endOf("isoWeek"),
+                ]}
               />
               <Select
                 placeholder="Violation Type"

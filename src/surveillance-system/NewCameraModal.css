@@ -36,8 +36,15 @@
 .camera-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
   gap: 20px;
+}
+
+.camera-field {
+  display: grid;
+  grid-template-columns: 10% 1fr;
+  gap: 16px;
+  align-items: center;
+  text-align: left;
 }
 
 .ant-steps-item-process .ant-steps-item-icon {

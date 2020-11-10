@@ -1,9 +1,8 @@
 import * as React from "react";
 import { Drawer, Steps, Button, Form, Input, Select } from "antd";
-import "./NewCameraModal.css";
-import DrawLines from "./DrawLines";
+// import DrawLines from "./DrawLines";
 
-class NewCameraModal extends React.Component {
+class UpdateCameraModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -59,6 +58,26 @@ class NewCameraModal extends React.Component {
       });
   };
 
+  getCameraById = (id) => {
+    if (id !== -1) {
+      fetch(`http://localhost:8080/camera/getById?cameraId=${id}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      })
+        .then((Response) => Response.json())
+        .then((camera) => {
+          this.setState({ data: camera });
+          console.log("camera", camera);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
+
   onFinish = (values) => {
     const next = this.state.current + 1;
     const info = values;
@@ -92,6 +111,15 @@ class NewCameraModal extends React.Component {
 
   componentDidMount = () => {
     this.fetchGroupByName();
+    this.getCameraById(this.props.cameraId);
+    console.log("id", this.props.cameraId);
+  };
+
+  componentDidUpdate = (prop) => {
+    if (this.props.cameraId !== prop.cameraId) {
+      this.getCameraById(this.props.cameraId);
+      console.log("id", this.props.cameraId);
+    }
   };
 
   render() {
@@ -99,7 +127,7 @@ class NewCameraModal extends React.Component {
       <Drawer
         height="85vh"
         placement="bottom"
-        title="Create a new camera"
+        title="Update camera"
         onClose={this.props.onCancel}
         visible={this.props.visible}
       >
@@ -114,7 +142,7 @@ class NewCameraModal extends React.Component {
             <Form
               name="basic"
               onFinish={this.onFinish}
-              // initialValues={this.state.data}
+              initialValues={this.state.data}
             >
               <div className="camera-form">
                 <Form.Item
@@ -202,16 +230,16 @@ class NewCameraModal extends React.Component {
             </Button>
           </>
         )}
-        {this.state.current === 1 && (
+        {/* {this.state.current === 1 && (
           <DrawLines
             prev={this.prev}
             data={this.state.data}
             onCancel={this.props.onCancel}
           />
-        )}
+        )} */}
       </Drawer>
     );
   }
 }
 
-export default NewCameraModal;
+export default UpdateCameraModal;

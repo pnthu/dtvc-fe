@@ -67,7 +67,7 @@ class Body extends React.Component {
         </Switch>
       );
     }
-    return <div>{routes}</div>;
+    return routes;
   }
 }
 
