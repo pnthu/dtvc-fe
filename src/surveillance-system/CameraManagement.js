@@ -220,6 +220,7 @@ class CameraManagement extends React.Component {
     }
     record.status = newStatus;
     await this.updateStatus(record);
+    this.setState({ selectedStatus: "" });
   };
 
   componentDidMount = () => {
@@ -256,7 +257,7 @@ class CameraManagement extends React.Component {
                     ))}
                 </Select>
                 <Select
-                  defaultValue=""
+                  value={this.state.selectedStatus}
                   placeholder="Status"
                   style={{ width: "40%" }}
                   onChange={this.onSelectedStatus}

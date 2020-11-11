@@ -1,7 +1,7 @@
 import * as React from "react";
 import "antd/dist/antd.css";
 import moment from "moment";
-import { Table, Button, Select, DatePicker } from "antd";
+import { Table, Button, Select, DatePicker, notification } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import "./recordManagement.css";
@@ -22,6 +22,7 @@ class RecordManagement extends React.Component {
       selectedStatus: "",
       fromDate: moment().startOf("isoWeek").format("yyyy-MM-DD"),
       toDate: moment().endOf("isoWeek").format("yyyy-MM-DD"),
+      mode: "view"
     };
   }
 
@@ -205,6 +206,43 @@ class RecordManagement extends React.Component {
     this.filter();
   };
 
+  updateLicense = (number, data) => {
+    fetch(
+      `http://localhost:8080/case/update?caseId=${data.caseId}&licensePlate=${number}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((Response) => {
+      if (Response.status === 200) {
+        notification.success({
+          message: "Update license plate number succcessfully!",
+          placement: "bottomLeft",
+        });
+      } else {
+        notification.error({
+          message: "Update license plate failed!",
+          placement: "bottomLeft",
+        });
+      }
+      return Response.json();
+    }).then((data) => {
+      this.fetchAllCases();
+      this.setState({ visible: true, record: data });
+    });
+  };
+
+  closeCancel = () => {
+    this.setState({ mode: "view" })
+  }
+
+  handleUpdate = (values, data) => {
+    this.updateLicense(values.license, data);
+  };
+
   render() {
     return (
       <>
@@ -258,9 +296,8 @@ class RecordManagement extends React.Component {
         <RecordDetail
           visible={this.state.visible}
           data={this.state.record}
-          handleApprove={this.handleApprove}
-          handleReject={this.handleReject}
           onClose={this.onClose}
+          handleUpdate={this.handleUpdate}
         />
       </>
     );

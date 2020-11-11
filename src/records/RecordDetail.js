@@ -69,31 +69,6 @@ class RecordDetail extends React.Component {
     });
   };
 
-  updateLicense = (number) => {
-    fetch(
-      `http://localhost:8080/case/update?caseId=${this.props.data.caseId}&licensePlate=${number}`,
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    ).then((Response) => {
-      if (Response.status === 200) {
-        notification.success({
-          message: "Update license plate number succcessfully!",
-          placement: "bottomLeft",
-        });
-      } else {
-        notification.error({
-          message: "Update license plate failed!",
-          placement: "bottomLeft",
-        });
-      }
-    });
-  };
-
   handleApprove = () => {
     this.approveCase();
     this.props.onClose();
@@ -106,46 +81,12 @@ class RecordDetail extends React.Component {
     window.location.reload();
   };
 
-  handleUpdate = (values) => {
-    this.updateLicense(values.license);
-    window.location.reload();
-  };
-
   openConfirm = () => {
     this.setState({ confirmVisible: true });
   };
 
   closeConfirm = () => {
     this.setState({ confirmVisible: false });
-  };
-
-  actions = {
-    unconfirmed: (
-      <div style={{ textAlign: "right" }}>
-        <Button
-          type="default"
-          style={{ marginRight: "24px" }}
-          onClick={this.handleReject}
-        >
-          Reject
-        </Button>
-        <Button type="primary" onClick={this.handleApprove}>
-          Approve
-        </Button>
-      </div>
-    ),
-    punishment: (
-      <div style={{ textAlign: "right" }}>
-        <a
-          href="https://firebasestorage.googleapis.com/v0/b/capstone-dtv.appspot.com/o/reports%2FViolation5.pdf?alt=media&token=7ba7a939-9a28-465f-bfe0-7f57e9f8cca0&fbclid=IwAR24cI4NUBXY5eOWs3m-j0B6mXb-KbXHfkh_vK4pxCBVueAYRdTkTN1XB3g"
-          target="_blank"
-          download
-        >
-          <Button type="primary">Export to PDF</Button>
-        </a>
-      </div>
-    ),
-    rejected: null,
   };
 
   titleCase = (str) => {
@@ -159,7 +100,36 @@ class RecordDetail extends React.Component {
   };
 
   render() {
-    console.log("data", this.props);
+    
+    let actions = {
+      unconfirmed: (
+        <div style={{ textAlign: "right" }}>
+          <Button
+            type="default"
+            style={{ marginRight: "24px" }}
+            onClick={this.handleReject}
+          >
+            Reject
+          </Button>
+          <Button type="primary" onClick={this.handleApprove}>
+            Approve
+          </Button>
+        </div>
+      ),
+      punishment: (
+        <div style={{ textAlign: "right" }}>
+          <a
+            href="https://firebasestorage.googleapis.com/v0/b/capstone-dtv.appspot.com/o/reports%2FViolation5.pdf?alt=media&token=7ba7a939-9a28-465f-bfe0-7f57e9f8cca0&fbclid=IwAR24cI4NUBXY5eOWs3m-j0B6mXb-KbXHfkh_vK4pxCBVueAYRdTkTN1XB3g"
+            target="_blank"
+            download
+          >
+            <Button type="primary">Export to PDF</Button>
+          </a>
+        </div>
+      ),
+      rejected: null,
+    };
+
     return (
       <>
         <Modal
@@ -209,7 +179,10 @@ class RecordDetail extends React.Component {
                 <Form
                   name="basic"
                   initialValues={{ license: this.props.data.licensePlate }}
-                  onFinish={this.handleUpdate}
+                  onFinish={(values) => { 
+                    this.props.handleUpdate(values, this.props.data);
+                    this.setState({ mode: MODE.VIEW });
+                  }}
                 >
                   <Form.Item name="license" style={{ marginBottom: "14px" }}>
                     <Input
@@ -248,7 +221,7 @@ class RecordDetail extends React.Component {
             height={300}
             style={{ marginBottom: "24px" }}
           />
-          <div>{this.actions[this.props.data.caseType]}</div>
+          <div>{actions[this.props.data.caseType]}</div>
         </Modal>
         <Modal visible={this.state.confirmVisible}>
           <h3 className="title">VIOLATION RECORD</h3>
