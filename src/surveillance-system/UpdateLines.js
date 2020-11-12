@@ -153,11 +153,6 @@ class UpdateLines extends React.Component {
           context: renderCtx,
         });
 
-        // const img = new Image();
-        // img.src = require("../image/test.jpg");
-        // img.onload = () => {
-        //   renderCtx.drawImage(img, 0, 0, 640, 360);
-        // };
       }
     }
   };
@@ -166,16 +161,21 @@ class UpdateLines extends React.Component {
     const ctx = this.state.context;
     const lines = this.state.data.lines;
     console.log("lines", lines[0].left);
-    for (let i = 0; i < lines.length; i++) {
-      ctx.beginPath();
-      //draw line
-      ctx.strokeStyle = "#f00";
-      ctx.lineWidth = 3;
-      ctx.moveTo(lines[i].left, lines[i].top);
-      ctx.lineTo(lines[i].right, lines[i].bottom);
-      ctx.closePath();
-      ctx.stroke();
-    }
+    const img = new Image();
+    img.src = require("../image/test.jpg");
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, 640, 360);
+        for (let i = 0; i < lines.length; i++) {
+          ctx.beginPath();
+          //draw line
+          ctx.strokeStyle = "#f00";
+          ctx.lineWidth = 3;
+          ctx.moveTo(lines[i].left, lines[i].top);
+          ctx.lineTo(lines[i].right, lines[i].bottom);
+          ctx.closePath();
+          ctx.stroke();
+        }
+    };
   };
 
   render() {
