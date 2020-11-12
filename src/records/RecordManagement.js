@@ -4,7 +4,7 @@ import moment from "moment";
 import { Table, Button, Select, DatePicker, notification } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
-import "./recordManagement.css";
+import "./RecordManagement.css";
 import RecordDetail from "./RecordDetail";
 
 class RecordManagement extends React.Component {

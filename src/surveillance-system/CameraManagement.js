@@ -113,7 +113,11 @@ class CameraManagement extends React.Component {
     })
       .then((Response) => Response.json())
       .then((cameras) => {
-        this.setState({ data: cameras });
+        this.setState({
+          data: cameras,
+          selectedLocation: "",
+          selectedStatus: "",
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -157,16 +161,17 @@ class CameraManagement extends React.Component {
       });
   };
 
-  updateStatus = async (record) => {
-    const status = record.status;
-    await fetch("http://localhost:8080/camera/update", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(record),
-    }).then((Response) => {
+  updateStatus = async (id, status) => {
+    await fetch(
+      `http://localhost:8080/camera/updateStatus?cameraId=${id}&status=${status}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((Response) => {
       if (status === "Active") {
         if (Response.status === 200) {
           notification.success({
@@ -193,7 +198,6 @@ class CameraManagement extends React.Component {
         }
       }
     });
-    this.setState({ selectedLocation: "", selectedStatus: "" });
     this.fetchCameras();
   };
 
@@ -219,8 +223,7 @@ class CameraManagement extends React.Component {
       newStatus = "Inactive";
     }
     record.status = newStatus;
-    await this.updateStatus(record);
-    this.setState({ selectedStatus: "" });
+    await this.updateStatus(record.cameraId, newStatus);
   };
 
   componentDidMount = () => {
@@ -239,6 +242,7 @@ class CameraManagement extends React.Component {
             <div className="top-row">
               <div className="camera-filter">
                 <Select
+                  // value={this.state.selectedLocation}
                   showSearch
                   allowClear
                   placeholder="Location"

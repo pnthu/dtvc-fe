@@ -81,14 +81,6 @@ class RecordDetail extends React.Component {
     window.location.reload();
   };
 
-  openConfirm = () => {
-    this.setState({ confirmVisible: true });
-  };
-
-  closeConfirm = () => {
-    this.setState({ confirmVisible: false });
-  };
-
   titleCase = (str) => {
     return str
       .toLowerCase()
@@ -100,7 +92,6 @@ class RecordDetail extends React.Component {
   };
 
   render() {
-    
     let actions = {
       unconfirmed: (
         <div style={{ textAlign: "right" }}>
@@ -118,11 +109,7 @@ class RecordDetail extends React.Component {
       ),
       punishment: (
         <div style={{ textAlign: "right" }}>
-          <a
-            href="https://firebasestorage.googleapis.com/v0/b/capstone-dtv.appspot.com/o/reports%2FViolation5.pdf?alt=media&token=7ba7a939-9a28-465f-bfe0-7f57e9f8cca0&fbclid=IwAR24cI4NUBXY5eOWs3m-j0B6mXb-KbXHfkh_vK4pxCBVueAYRdTkTN1XB3g"
-            target="_blank"
-            download
-          >
+          <a href={this.props.data.reportUrl} target="_blank" download>
             <Button type="primary">Export to PDF</Button>
           </a>
         </div>
@@ -179,7 +166,7 @@ class RecordDetail extends React.Component {
                 <Form
                   name="basic"
                   initialValues={{ license: this.props.data.licensePlate }}
-                  onFinish={(values) => { 
+                  onFinish={(values) => {
                     this.props.handleUpdate(values, this.props.data);
                     this.setState({ mode: MODE.VIEW });
                   }}
@@ -207,8 +194,12 @@ class RecordDetail extends React.Component {
                   </Button>
                 </Form>
               )}
-
-              <p>
+              <p
+                style={{
+                  marginTop:
+                    this.props.data.licensePlate === "" ? "60px" : "0px",
+                }}
+              >
                 {this.props.data.caseType &&
                   this.titleCase(this.props.data.caseType)}
               </p>
