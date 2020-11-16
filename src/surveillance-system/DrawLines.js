@@ -2,11 +2,11 @@ import * as React from "react";
 import { Steps, Button, notification } from "antd";
 
 const LINE_TYPE = [
-  { label: "line1", value: "Horzontal line" },
-  { label: "line2", value: "Vertical Line" },
-  { label: "line3", value: "Left bound" },
-  { label: "line4", value: "Upper bound" },
-  { label: "line5", value: "Right bound" },
+  { label: "line1", value: "horizontal" },
+  { label: "line2", value: "vertical" },
+  { label: "line3", value: "left_bound" },
+  { label: "line4", value: "upper_bound" },
+  { label: "line5", value: "right_bound" },
 ];
 
 class DrawLines extends React.Component {
@@ -68,7 +68,7 @@ class DrawLines extends React.Component {
       ctx.strokeStyle = "#f00";
       ctx.lineWidth = 10;
       ctx.stroke();
-      ctx.closePath();
+      // ctx.closePath();
     }
   };
 
@@ -81,7 +81,7 @@ class DrawLines extends React.Component {
     ctx.moveTo(this.state.points[pos - 2].x, this.state.points[pos - 2].y);
     ctx.lineTo(this.state.points[pos - 1].x, this.state.points[pos - 1].y);
     ctx.stroke();
-    ctx.closePath();
+    // ctx.closePath();
     if (this.state.currentStep !== 4) {
       const next = this.state.currentStep + 1;
       this.setState({ currentStep: next });
@@ -113,9 +113,9 @@ class DrawLines extends React.Component {
       tmp.push(tmpPoint);
     }
     //map array
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 10; i += 2) {
       let line = {};
-      line.lineType = LINE_TYPE[i].value;
+      line.lineType = LINE_TYPE[i / 2].value;
       line.top = tmp[i].y;
       line.left = tmp[i].x;
       line.right = tmp[i + 1].x;
@@ -124,16 +124,16 @@ class DrawLines extends React.Component {
         case 0:
           tmpObj.line1 = line;
           break;
-        case 1:
+        case 2:
           tmpObj.line2 = line;
           break;
-        case 2:
+        case 4:
           tmpObj.line3 = line;
           break;
-        case 3:
+        case 6:
           tmpObj.line4 = line;
           break;
-        case 4:
+        case 8:
           tmpObj.line5 = line;
           break;
       }
@@ -152,12 +152,13 @@ class DrawLines extends React.Component {
           canvasOffsetTop: this.canvasRef.current.offsetTop,
           context: renderCtx,
         });
-
-        const img = new Image();
-        img.src = require("../image/test.jpg");
-        img.onload = () => {
-          renderCtx.drawImage(img, 0, 0, 640, 360);
-        };
+        // const img = new Image();
+        // img.src = require("../image/a.jpg");
+        // img.width = 672;
+        // img.height = 380;
+        // img.onload = () => {
+        //   renderCtx.drawImage(img, 0, 0, 672, 380);
+        // };
       }
     }
   };
@@ -193,14 +194,23 @@ class DrawLines extends React.Component {
               description="Choose the start and end point of the right bound of inspecting area"
             />
           </Steps>
-          <canvas
-            id="canvas"
-            ref={this.canvasRef}
-            width={640}
-            height={360}
-            onMouseUp={(evt) => this.handleMouseUp(evt)}
-            onMouseDown={(evt) => this.handleMouseDown(evt)}
-          ></canvas>
+          <div style={{ border: "1px solid #000", position: "relative" }}>
+            <img
+              src={require("../image/a.jpg")}
+              width={672}
+              height={380}
+              style={{ position: "relative" }}
+            />
+            <canvas
+              id="canvas"
+              ref={this.canvasRef}
+              width={672}
+              height={380}
+              onMouseUp={(evt) => this.handleMouseUp(evt)}
+              onMouseDown={(evt) => this.handleMouseDown(evt)}
+              style={{ border: "1px solid #f00" }}
+            ></canvas>
+          </div>
         </div>
         <div style={{ textAlign: "right", marginTop: "24px" }}>
           <Button onClick={this.props.prev}>Previous</Button>

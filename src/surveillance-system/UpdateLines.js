@@ -142,6 +142,11 @@ class UpdateLines extends React.Component {
     this.createCamera(tmpObj);
   };
 
+  clearAll = () => {
+    const ctx = this.state.context;
+    ctx.clearRect(0, 0, 640, 360);
+  };
+
   componentDidMount = () => {
     this.setState({ data: this.props.data });
     if (this.canvasRef.current) {
@@ -152,7 +157,6 @@ class UpdateLines extends React.Component {
           canvasOffsetTop: this.canvasRef.current.offsetTop,
           context: renderCtx,
         });
-
       }
     }
   };
@@ -162,19 +166,19 @@ class UpdateLines extends React.Component {
     const lines = this.state.data.lines;
     console.log("lines", lines[0].left);
     const img = new Image();
-    img.src = require("../image/test.jpg");
+    img.src = require("../image/a.jpg");
     img.onload = () => {
       ctx.drawImage(img, 0, 0, 640, 360);
-        for (let i = 0; i < lines.length; i++) {
-          ctx.beginPath();
-          //draw line
-          ctx.strokeStyle = "#f00";
-          ctx.lineWidth = 3;
-          ctx.moveTo(lines[i].left, lines[i].top);
-          ctx.lineTo(lines[i].right, lines[i].bottom);
-          ctx.closePath();
-          ctx.stroke();
-        }
+      for (let i = 0; i < lines.length; i++) {
+        ctx.beginPath();
+        //draw line
+        ctx.strokeStyle = "#f00";
+        ctx.lineWidth = 3;
+        ctx.moveTo(lines[i].left / 3, lines[i].top / 3);
+        ctx.lineTo(lines[i].right / 3, lines[i].bottom / 3);
+        ctx.stroke();
+        // ctx.closePath();
+      }
     };
   };
 
@@ -217,11 +221,28 @@ class UpdateLines extends React.Component {
             onMouseDown={(evt) => this.handleMouseDown(evt)}
           ></canvas>
         </div>
-        <div style={{ textAlign: "right", marginTop: "24px" }}>
-          <Button onClick={this.props.prev}>Previous</Button>
-          <Button type="primary" onClick={this.handleCreate}>
-            Create
-          </Button>
+        <div
+          style={{
+            marginTop: "24px",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <Button type="primary" style={{ marginRight: "8px" }}>
+              Undo
+            </Button>
+            <Button onClick={this.clearAll}>Clear All</Button>
+          </div>
+          <div>
+            <Button onClick={this.props.prev} style={{ marginRight: "8px" }}>
+              Previous
+            </Button>
+            <Button type="primary" onClick={this.handleCreate}>
+              Create
+            </Button>
+          </div>
         </div>
       </>
     );

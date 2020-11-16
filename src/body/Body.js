@@ -17,9 +17,31 @@ class Body extends React.Component {
     this.login = this.login.bind(this);
   }
 
-  login = () => {
-    window.sessionStorage.setItem("role", "moderator");
-    this.props.history.push("/streaming");
+  login = (data) => {
+    fetch("http://localhost:8080/auth/signin", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((Response) => Response.json())
+      .then((user) => {
+        if (user.status === "active") {
+          window.sessionStorage.setItem("role", user.role.name);
+          window.sessionStorage.setItem("fullname", user.fullname);
+          window.sessionStorage.setItem("username", user.username);
+          if (user.role.name === "moderator") {
+            this.props.history.push("/streaming");
+          } else if (user.role.name === "admin") {
+            this.props.history.push("/accounts");
+          }
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   logout = () => {

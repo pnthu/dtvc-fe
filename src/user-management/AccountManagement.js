@@ -39,7 +39,7 @@ class AccountManagement extends React.Component {
             style={{ width: "75px" }}
             checkedChildren="Active"
             unCheckedChildren="Inactive"
-            checked={record.status === "Active"}
+            checked={record.status === "active"}
             onClick={(checked, evt) => {
               self.tempRecord = record;
               self.onSwitch(checked);

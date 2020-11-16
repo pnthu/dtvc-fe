@@ -38,7 +38,9 @@ class ChangeProfileModal extends React.Component {
   };
 
   componentDidMount = () => {
-    this.setState({ username: "a@gmail.com", fullname: "Nguyen Van D" });
+    const username = window.sessionStorage.getItem("username");
+    const fullname = window.sessionStorage.getItem("fullname");
+    this.setState({ username: username, fullname: fullname });
   };
 
   render() {

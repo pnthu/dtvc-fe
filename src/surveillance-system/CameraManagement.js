@@ -282,7 +282,6 @@ class CameraManagement extends React.Component {
               className="table"
               columns={this.columns}
               dataSource={this.state.data}
-              pagination={{ defaultCurrent: 1, total: 10, pageSize: 10 }}
               loading={this.state.loading}
             />
           </div>

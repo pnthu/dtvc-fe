@@ -8,7 +8,7 @@ class ChangePasswordModal extends React.Component {
       username: "",
       oldPassword: "",
       newPassword: "",
-      confirmPassword: ""
+      confirmPassword: "",
     };
     this.formRef = React.createRef();
   }
@@ -35,7 +35,7 @@ class ChangePasswordModal extends React.Component {
             newPassword: "",
             confirmPassword: "",
           });
-          this.formRef.current.setFieldsValue({...this.state});
+          this.formRef.current.setFieldsValue({ ...this.state });
           this.props.onCancel();
         } else {
           notification.error({
@@ -63,7 +63,8 @@ class ChangePasswordModal extends React.Component {
   };
 
   componentDidMount = () => {
-    this.setState({ username: "a@gmail.com" });
+    const username = window.sessionStorage.getItem("username");
+    this.setState({ username: username });
   };
 
   render() {

@@ -4,7 +4,7 @@ import moment from "moment";
 import { Table, Button, Select, DatePicker, notification } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
-import "./recordManagement.css";
+import "./RecordManagement.css";
 import RecordDetail from "./RecordDetail";
 
 class RecordManagement extends React.Component {
@@ -22,7 +22,7 @@ class RecordManagement extends React.Component {
       selectedStatus: "",
       fromDate: moment().startOf("isoWeek").format("yyyy-MM-DD"),
       toDate: moment().endOf("isoWeek").format("yyyy-MM-DD"),
-      mode: "view"
+      mode: "view",
     };
   }
 
@@ -216,28 +216,30 @@ class RecordManagement extends React.Component {
           "Content-Type": "application/json",
         },
       }
-    ).then((Response) => {
-      if (Response.status === 200) {
-        notification.success({
-          message: "Update license plate number succcessfully!",
-          placement: "bottomLeft",
-        });
-      } else {
-        notification.error({
-          message: "Update license plate failed!",
-          placement: "bottomLeft",
-        });
-      }
-      return Response.json();
-    }).then((data) => {
-      this.fetchAllCases();
-      this.setState({ visible: true, record: data });
-    });
+    )
+      .then((Response) => {
+        if (Response.status === 200) {
+          notification.success({
+            message: "Update license plate number succcessfully!",
+            placement: "bottomLeft",
+          });
+        } else {
+          notification.error({
+            message: "Update license plate failed!",
+            placement: "bottomLeft",
+          });
+        }
+        return Response.json();
+      })
+      .then((data) => {
+        this.fetchAllCases();
+        this.setState({ visible: true, record: data });
+      });
   };
 
   closeCancel = () => {
-    this.setState({ mode: "view" })
-  }
+    this.setState({ mode: "view" });
+  };
 
   handleUpdate = (values, data) => {
     this.updateLicense(values.license, data);
