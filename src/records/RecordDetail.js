@@ -157,7 +157,11 @@ class RecordDetail extends React.Component {
               </p>
             </div>
             <div className="modalRight">
-              <p>{moment(this.props.data.createdDate).format("DD/MM/yyyy")}</p>
+              <p>
+                {moment(this.props.data.createdDate).format(
+                  "DD/MM/yyyy hh:mm:ss"
+                )}
+              </p>
               <p>{this.props.data.image.camera.location}</p>
               <p>{this.props.data.violationType.name}</p>
               {this.state.mode === MODE.VIEW ? (

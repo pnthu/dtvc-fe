@@ -15,6 +15,7 @@ class NewCameraModal extends React.Component {
       groupText: "",
       existedPosition: null,
       existedGroup: true,
+      image: "",
     };
   }
 
@@ -59,9 +60,30 @@ class NewCameraModal extends React.Component {
       });
   };
 
+  getImageFromCamera = (cameraUrl) => {
+    fetch(`http://localhost:8080/camera/getImageFromCamera`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(cameraUrl),
+    })
+      .then((Response) => Response.json())
+      .then((image) => {
+        this.setState({ image: image });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   onFinish = (values) => {
     const next = this.state.current + 1;
     const info = values;
+    const image = {};
+    image.cameraUrl = info.connectionUrl;
+    this.getImageFromCamera(image);
     info.status = "Active";
     if (!this.state.existedGroup) {
       this.setState({
@@ -206,6 +228,7 @@ class NewCameraModal extends React.Component {
           <DrawLines
             prev={this.prev}
             data={this.state.data}
+            image={this.state.image}
             onCancel={this.props.onCancel}
           />
         )}

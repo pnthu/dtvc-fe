@@ -1,5 +1,7 @@
 import * as React from "react";
-import { Steps, Button, notification } from "antd";
+import { Steps, Button, Popover, notification } from "antd";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const LINE_TYPE = [
   { label: "line1", value: "horizontal" },
@@ -143,6 +145,7 @@ class DrawLines extends React.Component {
   };
 
   componentDidMount = () => {
+    console.log("props", this.props);
     this.setState({ data: this.props.data });
     if (this.canvasRef.current) {
       const renderCtx = this.canvasRef.current.getContext("2d");
@@ -152,19 +155,26 @@ class DrawLines extends React.Component {
           canvasOffsetTop: this.canvasRef.current.offsetTop,
           context: renderCtx,
         });
-        // const img = new Image();
-        // img.src = require("../image/a.jpg");
-        // img.width = 672;
-        // img.height = 380;
-        // img.onload = () => {
-        //   renderCtx.drawImage(img, 0, 0, 672, 380);
-        // };
       }
     }
   };
 
+  componentDidUpdate = () => {
+    if (this.props.image.frame) {
+      console.log("image", this.props.image.frame);
+      const ctx = this.state.context;
+      const img = new Image();
+      img.src = `data:image/png;base64, ${this.props.image.frame}`;
+      img.width = 672;
+      img.height = 380;
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, 672, 380);
+      };
+    }
+  };
+
   render() {
-    console.log("data", this.props.data);
+    console.log("data", this.props.image);
     return (
       <>
         <div className="next-step">
@@ -194,23 +204,40 @@ class DrawLines extends React.Component {
               description="Choose the start and end point of the right bound of inspecting area"
             />
           </Steps>
-          <div style={{ border: "1px solid #000", position: "relative" }}>
-            <img
-              src={require("../image/a.jpg")}
-              width={672}
-              height={380}
-              style={{ position: "relative" }}
-            />
-            <canvas
-              id="canvas"
-              ref={this.canvasRef}
-              width={672}
-              height={380}
-              onMouseUp={(evt) => this.handleMouseUp(evt)}
-              onMouseDown={(evt) => this.handleMouseDown(evt)}
-              style={{ border: "1px solid #f00" }}
-            ></canvas>
+          <div
+            style={{
+              display: "grid",
+              position: "relative",
+              top: "4px",
+              left: "-320px",
+              color: "#c0c0c0",
+              fontSize: "16px",
+            }}
+          >
+            <Popover placement="topLeft" content={<div>Image here</div>}>
+              <FontAwesomeIcon icon={faInfoCircle} />
+            </Popover>
+            <Popover placement="topLeft" content={<div>Image here</div>}>
+              <FontAwesomeIcon icon={faInfoCircle} />
+            </Popover>
+            <Popover placement="topLeft" content={<div>Image here</div>}>
+              <FontAwesomeIcon icon={faInfoCircle} />
+            </Popover>
+            <Popover placement="topLeft" content={<div>Image here</div>}>
+              <FontAwesomeIcon icon={faInfoCircle} />
+            </Popover>
+            <Popover placement="topLeft" content={<div>Image here</div>}>
+              <FontAwesomeIcon icon={faInfoCircle} />
+            </Popover>
           </div>
+          <canvas
+            id="canvas"
+            ref={this.canvasRef}
+            width={672}
+            height={380}
+            onMouseUp={(evt) => this.handleMouseUp(evt)}
+            onMouseDown={(evt) => this.handleMouseDown(evt)}
+          ></canvas>
         </div>
         <div style={{ textAlign: "right", marginTop: "24px" }}>
           <Button onClick={this.props.prev}>Previous</Button>
