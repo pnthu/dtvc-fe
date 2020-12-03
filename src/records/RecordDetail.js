@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Modal, Button, Form, Input, notification } from "antd";
+import { Modal, Button, Form, AutoComplete, Input, notification } from "antd";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
@@ -16,6 +16,7 @@ class RecordDetail extends React.Component {
     this.state = {
       mode: MODE.VIEW,
       confirmVisible: false,
+      licenses: [],
     };
   }
 
@@ -67,6 +68,23 @@ class RecordDetail extends React.Component {
         });
       }
     });
+  };
+
+  getLicense = () => {
+    fetch("http://localhost:8080/case/getLicense", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((Response) => Response.json())
+      .then((licenses) => {
+        this.setState({ licenses: licenses });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   handleApprove = () => {
@@ -141,7 +159,10 @@ class RecordDetail extends React.Component {
                 <p className="label">License Plate Number</p>
                 <Button
                   style={{ marginBottom: "14px" }}
-                  onClick={() => this.setState({ mode: MODE.EDIT })}
+                  onClick={() => {
+                    this.getLicense();
+                    this.setState({ mode: MODE.EDIT });
+                  }}
                   type="text"
                 >
                   <FontAwesomeIcon icon={faEdit} />
@@ -159,10 +180,10 @@ class RecordDetail extends React.Component {
             <div className="modalRight">
               <p>
                 {moment(this.props.data.createdDate).format(
-                  "DD/MM/yyyy hh:mm:ss"
+                  "DD/MM/yyyy HH:mm:ss"
                 )}
               </p>
-              <p>{this.props.data.image.camera.location}</p>
+              <p>{this.props.data.location}</p>
               <p>{this.props.data.violationType.name}</p>
               {this.state.mode === MODE.VIEW ? (
                 <p>{this.props.data.licensePlate}</p>
@@ -176,7 +197,7 @@ class RecordDetail extends React.Component {
                   }}
                 >
                   <Form.Item name="license" style={{ marginBottom: "14px" }}>
-                    <Input
+                    {/* <Input
                       placeholder="License plate number"
                       rules={[
                         {
@@ -184,7 +205,17 @@ class RecordDetail extends React.Component {
                           message: "Please input license plate number",
                         },
                       ]}
-                    />
+                    /> */}
+                    <AutoComplete>
+                      {this.state.licenses.map((license) => (
+                        <AutoComplete.Option>
+                          {license} -
+                          <p style={{ color: "#c0c0c0", fontSize: "12px" }}>
+                            approved less than 30 seconds ago
+                          </p>
+                        </AutoComplete.Option>
+                      ))}
+                    </AutoComplete>
                   </Form.Item>
                   <Button
                     type="default"

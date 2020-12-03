@@ -10,9 +10,8 @@ import ChangeProfileModal from "../user-management/ChangeProfileModal";
 const permissions = {
   moderator: [
     { link: "/report", name: "Report" },
-    { link: "/records", name: "Records" },
     { link: "/cameras", name: "Surveillance System" },
-    { link: "/streaming", name: "Video Streaming" },
+    { link: "/records", name: "Records" },
   ],
   admin: [{ link: "/accounts", name: "Account Management" }],
 };

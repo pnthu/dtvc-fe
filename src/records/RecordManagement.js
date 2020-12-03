@@ -55,7 +55,7 @@ class RecordManagement extends React.Component {
     },
     {
       title: "Location",
-      dataIndex: ["image", "camera", "location"],
+      dataIndex: "location",
       key: "location",
       ellipsis: true,
     },
@@ -133,8 +133,8 @@ class RecordManagement extends React.Component {
   };
 
   filter = (
-    from = moment().startOf("isoWeek").format("yyyy-MM-DD"),
-    to = moment().endOf("isoWeek").format("yyyy-MM-DD"),
+    from = moment().startOf("isoWeek").format("yyyy-MM-DD HH:mm:ss"),
+    to = moment().endOf("isoWeek").format("yyyy-MM-DD HH:mm:ss"),
     violationType = "",
     caseType = ""
   ) => {

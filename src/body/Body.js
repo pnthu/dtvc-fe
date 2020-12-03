@@ -33,7 +33,7 @@ class Body extends React.Component {
           window.sessionStorage.setItem("fullname", user.fullname);
           window.sessionStorage.setItem("username", user.username);
           if (user.role.name === "moderator") {
-            this.props.history.push("/streaming");
+            this.props.history.push("/records");
           } else if (user.role.name === "admin") {
             this.props.history.push("/accounts");
           }
@@ -69,9 +69,9 @@ class Body extends React.Component {
         <>
           <Header role={role} logout={this.logout} />
           <Switch>
-            <Route path="/streaming" exact component={VideoStreaming} />
-            <Route path="/cameras" exact component={CameraManagement} />
+            {/* <Route path="/streaming" exact component={VideoStreaming} /> */}
             <Route path="/records" exact component={RecordManagement} />
+            <Route path="/cameras" exact component={CameraManagement} />
             <Route path="/report" exact component={Report} />
             <Route component={Error} />
           </Switch>
