@@ -24,6 +24,7 @@ class DrawLines extends React.Component {
       canvasOffsetTop: 0,
       currentStep: 0,
       data: {},
+      init: true,
     };
     var point = {};
   }
@@ -110,8 +111,14 @@ class DrawLines extends React.Component {
     for (let i = 0; i < this.state.points.length; i++) {
       point = this.state.points[i];
       let tmpPoint = {};
-      tmpPoint.x = point.x * 3;
-      tmpPoint.y = point.y * 3;
+      if (this.props.data.position === "Right") {
+        tmpPoint.x = point.x * 4;
+        tmpPoint.y = point.y * 4;
+      } else {
+        tmpPoint.x = point.x * 3;
+        tmpPoint.y = point.y * 3;
+      }
+
       tmp.push(tmpPoint);
     }
     //map array
@@ -160,21 +167,27 @@ class DrawLines extends React.Component {
   };
 
   componentDidUpdate = () => {
-    if (this.props.image.frame) {
+    if (this.props.image.frame && this.state.init) {
       console.log("image", this.props.image.frame);
       const ctx = this.state.context;
       const img = new Image();
       img.src = `data:image/png;base64, ${this.props.image.frame}`;
-      img.width = 672;
-      img.height = 380;
+      if (this.props.data.position === "Right") {
+        img.width = 672;
+        img.height = 380;
+      } else {
+        img.width = 640;
+        img.height = 360;
+      }
       img.onload = () => {
-        ctx.drawImage(img, 0, 0, 672, 380);
+        ctx.drawImage(img, 0, 0, img.width, img.height);
       };
+      this.setState({ init: false });
     }
   };
 
   render() {
-    console.log("data", this.props.image);
+    console.log("data", this.props.data);
     return (
       <>
         <div className="next-step">
@@ -189,7 +202,7 @@ class DrawLines extends React.Component {
             />
             <Steps.Step
               title="Draw vertical line"
-              description="Choose the start and end point of the broken white lane line"
+              description="Choose the start and end point of the white lane line"
             />
             <Steps.Step
               title="Draw inspecting area"
@@ -233,8 +246,8 @@ class DrawLines extends React.Component {
           <canvas
             id="canvas"
             ref={this.canvasRef}
-            width={672}
-            height={380}
+            width={this.props.data.position === "Right" ? 672 : 640}
+            height={this.props.data.position === "Right" ? 380 : 360}
             onMouseUp={(evt) => this.handleMouseUp(evt)}
             onMouseDown={(evt) => this.handleMouseDown(evt)}
           ></canvas>

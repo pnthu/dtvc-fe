@@ -164,7 +164,7 @@ class RecordManagement extends React.Component {
     this.setState({ selectedType: value });
     this.filter(
       this.state.fromDate,
-      this.state.toDate,
+      `${this.state.toDate} 23:59:59`,
       value,
       this.state.selectedStatus
     );
@@ -174,7 +174,7 @@ class RecordManagement extends React.Component {
     this.setState({ selectedStatus: value });
     this.filter(
       this.state.fromDate,
-      this.state.toDate,
+      `${this.state.toDate} 23:59:59`,
       this.state.selectedType,
       value
     );
@@ -188,7 +188,12 @@ class RecordManagement extends React.Component {
         fromDate: from,
         toDate: to,
       });
-      this.filter(from, to, this.state.selectedType, this.state.selectedStatus);
+      this.filter(
+        from,
+        `${to} 23:59:59`,
+        this.state.selectedType,
+        this.state.selectedStatus
+      );
     }
   };
 

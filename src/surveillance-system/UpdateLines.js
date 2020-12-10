@@ -22,34 +22,35 @@ class UpdateLines extends React.Component {
       canvasOffsetTop: 0,
       currentStep: 0,
       data: {},
+      init: true,
     };
     var point = {};
   }
 
-  createCamera = (body) => {
-    fetch(`http://localhost:8080/camera/create`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    }).then((Response) => {
-      if (Response.status === 200) {
-        notification.success({
-          message: "Update camera succcessfully!",
-          placement: "bottomLeft",
-        });
-        this.props.onCancel();
-        window.location.reload();
-      } else {
-        notification.error({
-          message: "Update camera failed!",
-          placement: "bottomLeft",
-        });
-      }
-    });
-  };
+  // updateCamera = (body) => {
+  //   fetch(`http://localhost:8080/camera/update`, {
+  //     method: "POST",
+  //     headers: {
+  //       Accept: "application/json",
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(body),
+  //   }).then((Response) => {
+  //     if (Response.status === 200) {
+  //       notification.success({
+  //         message: "Update camera succcessfully!",
+  //         placement: "bottomLeft",
+  //       });
+  //       this.props.onCancel();
+  //       window.location.reload();
+  //     } else {
+  //       notification.error({
+  //         message: "Update camera failed!",
+  //         placement: "bottomLeft",
+  //       });
+  //     }
+  //   });
+  // };
 
   drawPoint = (evt) => {
     if (this.state.context) {
@@ -144,7 +145,12 @@ class UpdateLines extends React.Component {
 
   clearAll = () => {
     const ctx = this.state.context;
-    ctx.clearRect(0, 0, 640, 360);
+    ctx.clearRect(0, 0, 672, 380);
+    const img = new Image();
+    img.src = `data:image/png;base64, ${this.props.image.frame}`;
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, 672, 380);
+    };
   };
 
   componentDidMount = () => {
@@ -162,27 +168,39 @@ class UpdateLines extends React.Component {
   };
 
   componentDidUpdate = () => {
-    const ctx = this.state.context;
-    const lines = this.state.data.lines;
-    console.log("lines", lines[0].left);
-    const img = new Image();
-    img.src = require("../image/a.jpg");
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, 640, 360);
-      for (let i = 0; i < lines.length; i++) {
-        ctx.beginPath();
-        //draw line
-        ctx.strokeStyle = "#f00";
-        ctx.lineWidth = 3;
-        ctx.moveTo(lines[i].left / 3, lines[i].top / 3);
-        ctx.lineTo(lines[i].right / 3, lines[i].bottom / 3);
-        ctx.stroke();
-        // ctx.closePath();
-      }
-    };
+    if (this.props.image.frame && this.state.init) {
+      const ctx = this.state.context;
+      const lines = this.state.data.lines;
+      const img = new Image();
+      img.src = `data:image/png;base64, ${this.props.image.frame}`;
+      img.onload = () => {
+        if (this.props.data.position === "right") {
+          ctx.drawImage(img, 0, 0, 672, 380);
+        } else {
+          ctx.drawImage(img, 0, 0, 640, 360);
+        }
+
+        for (let i = 0; i < lines.length; i++) {
+          ctx.beginPath();
+          //draw line
+          ctx.strokeStyle = "#f00";
+          ctx.lineWidth = 3;
+          if (this.props.data.position === "right") {
+            ctx.moveTo(lines[i].left / 4, lines[i].top / 4);
+            ctx.lineTo(lines[i].right / 4, lines[i].bottom / 4);
+          } else {
+            ctx.moveTo(lines[i].left / 3, lines[i].top / 3);
+            ctx.lineTo(lines[i].right / 3, lines[i].bottom / 3);
+          }
+          ctx.stroke();
+        }
+      };
+      this.setState({ init: false });
+    }
   };
 
   render() {
+    console.log("data", this.props.data);
     return (
       <>
         <div className="next-step">
@@ -215,8 +233,8 @@ class UpdateLines extends React.Component {
           <canvas
             id="canvas"
             ref={this.canvasRef}
-            width={640}
-            height={360}
+            width={this.props.data.position === "right" ? 672 : 640}
+            height={this.props.data.position === "right" ? 380 : 360}
             onMouseUp={(evt) => this.handleMouseUp(evt)}
             onMouseDown={(evt) => this.handleMouseDown(evt)}
           ></canvas>

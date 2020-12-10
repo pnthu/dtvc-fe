@@ -55,7 +55,7 @@ class CameraManagement extends React.Component {
             style={{ width: "75px" }}
             checkedChildren="Active"
             unCheckedChildren="Inactive"
-            checked={record.status === "Active"}
+            checked={record.status === "active"}
             onClick={(checked, evt) => {
               self.tempRecord = record;
               self.onSwitch(checked);
@@ -218,9 +218,9 @@ class CameraManagement extends React.Component {
     let newStatus;
     let record = this.tempRecord;
     if (checked) {
-      newStatus = "Active";
+      newStatus = "active";
     } else {
-      newStatus = "Inactive";
+      newStatus = "inactive";
     }
     record.status = newStatus;
     await this.updateStatus(record.cameraId, newStatus);

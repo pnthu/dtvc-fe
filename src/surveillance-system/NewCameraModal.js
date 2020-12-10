@@ -84,7 +84,7 @@ class NewCameraModal extends React.Component {
     const image = {};
     image.cameraUrl = info.connectionUrl;
     this.getImageFromCamera(image);
-    info.status = "Active";
+    info.status = "active";
     if (!this.state.existedGroup) {
       this.setState({
         selectedGroup: { groupId: 0, groupName: values.groupCamera },
@@ -194,13 +194,13 @@ class NewCameraModal extends React.Component {
                   <Select placeholder="Position" style={{ textAlign: "left" }}>
                     {this.state.existedPosition === null ? (
                       <>
-                        <Select.Option value="Left">Left</Select.Option>
-                        <Select.Option value="Right">Right</Select.Option>
+                        <Select.Option value="left">Left</Select.Option>
+                        <Select.Option value="right">Right</Select.Option>
                       </>
-                    ) : this.state.existedPosition === "Left" ? (
-                      <Select.Option value="Left">Right</Select.Option>
+                    ) : this.state.existedPosition === "left" ? (
+                      <Select.Option value="right">Right</Select.Option>
                     ) : (
-                      <Select.Option value="Left">Left</Select.Option>
+                      <Select.Option value="left">Left</Select.Option>
                     )}
                   </Select>
                 </Form.Item>

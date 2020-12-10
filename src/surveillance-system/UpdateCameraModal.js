@@ -15,6 +15,7 @@ class UpdateCameraModal extends React.Component {
       existedPosition: null,
       existedGroup: true,
       groupCamera: null,
+      image: "",
     };
     this.formRef = React.createRef();
   }
@@ -90,6 +91,24 @@ class UpdateCameraModal extends React.Component {
     }
   };
 
+  getImageFromCamera = (cameraUrl) => {
+    fetch(`http://localhost:8080/camera/getImageFromCamera`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(cameraUrl),
+    })
+      .then((Response) => Response.json())
+      .then((image) => {
+        this.setState({ image: image });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   onFinish = (values) => {
     const next = this.state.current + 1;
     const info = this.state.data;
@@ -97,6 +116,9 @@ class UpdateCameraModal extends React.Component {
     info.location = values.location;
     info.connectionUrl = values.connectionUrl;
     info.position = values.position;
+    const image = {};
+    image.cameraUrl = info.connectionUrl;
+    this.getImageFromCamera(image);
     if (!this.state.existedGroup) {
       this.setState({
         selectedGroup: { groupId: 0, groupName: values.groupCamera },
@@ -279,6 +301,7 @@ class UpdateCameraModal extends React.Component {
           <UpdateLines
             prev={this.prev}
             data={this.state.data}
+            image={this.state.image}
             onCancel={this.props.onCancel}
           />
         )}
