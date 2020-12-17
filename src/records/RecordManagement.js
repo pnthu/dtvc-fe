@@ -4,7 +4,7 @@ import moment from "moment";
 import { Table, Button, Select, DatePicker, notification } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
-import "./RecordManagement.css";
+import "./recordManagement.css";
 import RecordDetail from "./RecordDetail";
 
 class RecordManagement extends React.Component {
@@ -29,7 +29,7 @@ class RecordManagement extends React.Component {
   columns = [
     {
       title: "No.",
-      dataIndex: "caseId",
+      dataIndex: "No",
       key: "no",
       width: "5%",
     },
@@ -151,7 +151,7 @@ class RecordManagement extends React.Component {
       .then((Response) => Response.json())
       .then((cases) => {
         if (cases !== null) {
-          this.setState({ data: cases });
+          this.setState({ data: this.addNumberIndex(cases) });
         }
       })
       .catch((error) => {
@@ -210,6 +210,15 @@ class RecordManagement extends React.Component {
     // this.fetchAllCases();
     this.filter();
   };
+
+  addNumberIndex = (caseList) => {
+    let index = 1;
+    for (let i = 0; i < caseList.length; i++) {
+        caseList[i]['No'] = index;
+        index++;
+    }
+    return caseList;
+  }
 
   updateLicense = (number, data) => {
     fetch(
