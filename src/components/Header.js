@@ -22,6 +22,7 @@ class Header extends React.Component {
     this.state = {
       profileVisible: false,
       passwordVisible: false,
+      fullname: "",
     };
   }
 
@@ -39,6 +40,11 @@ class Header extends React.Component {
 
   onClosePassword = () => {
     this.setState({ passwordVisible: false });
+  };
+
+  componentDidMount = () => {
+    const fullname = window.sessionStorage.getItem("fullname");
+    this.setState({ fullname: fullname });
   };
 
   render() {
@@ -72,7 +78,7 @@ class Header extends React.Component {
               <Popover content={content} placement="bottomRight">
                 <FontAwesomeIcon icon={faChevronDown} />
               </Popover>
-              <div>Hello, User</div>
+              <div>Hello, {this.state.fullname}</div>
             </div>
             {permissions[this.props.role] instanceof Array &&
               permissions[this.props.role].map((permission) => {

@@ -85,7 +85,10 @@ class DrawLines extends React.Component {
     ctx.lineTo(this.state.points[pos - 1].x, this.state.points[pos - 1].y);
     ctx.stroke();
     // ctx.closePath();
-    if (this.state.currentStep !== 4) {
+    if (
+      (this.props.data.position === "right" && this.state.currentStep !== 4) ||
+      (this.props.data.position === "left" && this.state.currentStep !== 3)
+    ) {
       const next = this.state.currentStep + 1;
       this.setState({ currentStep: next });
     }
@@ -93,7 +96,12 @@ class DrawLines extends React.Component {
 
   handleMouseDown = (evt) => {
     this.drawPoint(evt);
-    if (this.state.points.length % 2 === 0 && this.state.points.length <= 10) {
+    if (
+      this.state.points.length % 2 === 0 &&
+      ((this.props.data.position === "right" &&
+        this.state.points.length <= 10) ||
+        (this.props.data.position === "left" && this.state.points.length <= 8))
+    ) {
       this.drawLine();
     }
   };
@@ -111,7 +119,7 @@ class DrawLines extends React.Component {
     for (let i = 0; i < this.state.points.length; i++) {
       point = this.state.points[i];
       let tmpPoint = {};
-      if (this.props.data.position === "Right") {
+      if (this.props.data.position === "right") {
         tmpPoint.x = point.x * 4;
         tmpPoint.y = point.y * 4;
       } else {
@@ -122,7 +130,8 @@ class DrawLines extends React.Component {
       tmp.push(tmpPoint);
     }
     //map array
-    for (let i = 0; i < 10; i += 2) {
+    const maxPoint = this.props.data.position === "right" ? 10 : 8;
+    for (let i = 0; i < maxPoint; i += 2) {
       let line = {};
       line.lineType = LINE_TYPE[i / 2].value;
       line.top = tmp[i].y;
@@ -168,11 +177,10 @@ class DrawLines extends React.Component {
 
   componentDidUpdate = () => {
     if (this.props.image.frame && this.state.init) {
-      console.log("image", this.props.image.frame);
       const ctx = this.state.context;
       const img = new Image();
       img.src = `data:image/png;base64, ${this.props.image.frame}`;
-      if (this.props.data.position === "Right") {
+      if (this.props.data.position === "right") {
         img.width = 672;
         img.height = 380;
       } else {
@@ -200,10 +208,12 @@ class DrawLines extends React.Component {
               title="Draw horizontal line"
               description="Choose the start and end point of the white line near the traffic light"
             />
-            <Steps.Step
-              title="Draw vertical line"
-              description="Choose the start and end point of the white lane line"
-            />
+            {this.props.data.position === "right" && (
+              <Steps.Step
+                title="Draw vertical line"
+                description="Choose the start and end point of the white lane line"
+              />
+            )}
             <Steps.Step
               title="Draw inspecting area"
               description="Choose the start and end point of the left bound of inspecting area"
@@ -230,9 +240,11 @@ class DrawLines extends React.Component {
             <Popover placement="topLeft" content={<div>Image here</div>}>
               <FontAwesomeIcon icon={faInfoCircle} />
             </Popover>
-            <Popover placement="topLeft" content={<div>Image here</div>}>
-              <FontAwesomeIcon icon={faInfoCircle} />
-            </Popover>
+            {this.props.data.position === "right" && (
+              <Popover placement="topLeft" content={<div>Image here</div>}>
+                <FontAwesomeIcon icon={faInfoCircle} />
+              </Popover>
+            )}
             <Popover placement="topLeft" content={<div>Image here</div>}>
               <FontAwesomeIcon icon={faInfoCircle} />
             </Popover>
@@ -246,8 +258,8 @@ class DrawLines extends React.Component {
           <canvas
             id="canvas"
             ref={this.canvasRef}
-            width={this.props.data.position === "Right" ? 672 : 640}
-            height={this.props.data.position === "Right" ? 380 : 360}
+            width={this.props.data.position === "right" ? 672 : 640}
+            height={this.props.data.position === "right" ? 380 : 360}
             onMouseUp={(evt) => this.handleMouseUp(evt)}
             onMouseDown={(evt) => this.handleMouseDown(evt)}
           ></canvas>

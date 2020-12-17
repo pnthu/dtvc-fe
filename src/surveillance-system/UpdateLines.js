@@ -248,9 +248,9 @@ class UpdateLines extends React.Component {
           }}
         >
           <div>
-            <Button type="primary" style={{ marginRight: "8px" }}>
+            {/* <Button type="primary" style={{ marginRight: "8px" }}>
               Undo
-            </Button>
+            </Button> */}
             <Button onClick={this.clearAll}>Clear All</Button>
           </div>
           <div>
@@ -258,7 +258,7 @@ class UpdateLines extends React.Component {
               Previous
             </Button>
             <Button type="primary" onClick={this.handleCreate}>
-              Create
+              Update
             </Button>
           </div>
         </div>

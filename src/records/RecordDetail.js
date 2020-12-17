@@ -157,16 +157,18 @@ class RecordDetail extends React.Component {
                 }}
               >
                 <p className="label">License Plate Number</p>
-                <Button
-                  style={{ marginBottom: "14px" }}
-                  onClick={() => {
-                    this.getLicense();
-                    this.setState({ mode: MODE.EDIT });
-                  }}
-                  type="text"
-                >
-                  <FontAwesomeIcon icon={faEdit} />
-                </Button>
+                {this.props.data.caseType === "unconfirmed" && (
+                  <Button
+                    style={{ marginBottom: "14px" }}
+                    onClick={() => {
+                      this.getLicense();
+                      this.setState({ mode: MODE.EDIT });
+                    }}
+                    type="text"
+                  >
+                    <FontAwesomeIcon icon={faEdit} />
+                  </Button>
+                )}
               </div>
               <p
                 className="label"
