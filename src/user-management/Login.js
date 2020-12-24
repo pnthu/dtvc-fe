@@ -1,6 +1,6 @@
 import * as React from "react";
 import "antd/dist/antd.css";
-import { Button, Input, Form } from "antd";
+import { Button, Input, Form, Typography } from "antd";
 import "./Login.css";
 
 class Login extends React.Component {
@@ -22,7 +22,11 @@ class Login extends React.Component {
       <div className="loginBackground">
         <h1 className="loginTitle">Traffic Violation Detection System</h1>
         <img src={require("../logo.svg")} alt="logo" className="logo" />
-
+        {this.props.error !== null && (
+          <Typography.Text type="danger" style={{ textAlign: "left" }}>
+            {this.props.error}
+          </Typography.Text>
+        )}
         <Form name="basic" style={{ width: "50%" }} onFinish={this.login}>
           <Form.Item
             name="username"

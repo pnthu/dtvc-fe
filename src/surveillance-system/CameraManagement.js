@@ -25,8 +25,8 @@ class CameraManagement extends React.Component {
 
   columns = [
     {
-      title: "No",
-      dataIndex: "cameraId",
+      title: "No.",
+      dataIndex: "No",
       key: "no",
     },
     {
@@ -114,7 +114,7 @@ class CameraManagement extends React.Component {
       .then((Response) => Response.json())
       .then((cameras) => {
         this.setState({
-          data: cameras,
+          data: this.addNumberIndex(cameras),
           selectedLocation: "",
           selectedStatus: "",
         });
@@ -224,6 +224,15 @@ class CameraManagement extends React.Component {
     }
     record.status = newStatus;
     await this.updateStatus(record.cameraId, newStatus);
+  };
+
+  addNumberIndex = (list) => {
+    let index = 1;
+    for (let i = 0; i < list.length; i++) {
+      list[i]["No"] = index;
+      index++;
+    }
+    return list;
   };
 
   componentDidMount = () => {

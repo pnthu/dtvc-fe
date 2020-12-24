@@ -3,13 +3,26 @@ import { Steps, Button, Popover, notification } from "antd";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const LINE_TYPE = [
-  { label: "line1", value: "horizontal" },
-  { label: "line2", value: "vertical" },
-  { label: "line3", value: "left_bound" },
-  { label: "line4", value: "upper_bound" },
-  { label: "line5", value: "right_bound" },
-];
+const LINE_TYPE = {
+  left: ["horizontal", "left_bound", "upper_bound", "right_bound"],
+  right: ["horizontal", "vertical", "left_bound", "upper_bound", "right_bound"],
+};
+
+const LINE_POSITION = {
+  left: [
+    require("../image/left-horizontal.jpg"),
+    require("../image/left-left.jpg"),
+    require("../image/left-upper.jpg"),
+    require("../image/left-right.jpg"),
+  ],
+  right: [
+    require("../image/right-horizontal.jpg"),
+    require("../image/right-vertical.jpg"),
+    require("../image/right-left.jpg"),
+    require("../image/right-upper.jpg"),
+    require("../image/right-right.jpg"),
+  ],
+};
 
 class DrawLines extends React.Component {
   constructor(props) {
@@ -126,14 +139,13 @@ class DrawLines extends React.Component {
         tmpPoint.x = point.x * 3;
         tmpPoint.y = point.y * 3;
       }
-
       tmp.push(tmpPoint);
     }
     //map array
     const maxPoint = this.props.data.position === "right" ? 10 : 8;
     for (let i = 0; i < maxPoint; i += 2) {
       let line = {};
-      line.lineType = LINE_TYPE[i / 2].value;
+      line.lineType = LINE_TYPE[this.props.data.position][i / 2];
       line.top = tmp[i].y;
       line.left = tmp[i].x;
       line.right = tmp[i + 1].x;
@@ -204,10 +216,17 @@ class DrawLines extends React.Component {
             current={this.state.currentStep}
             direction="vertical"
           >
-            <Steps.Step
-              title="Draw horizontal line"
-              description="Choose the start and end point of the white line near the traffic light"
-            />
+            {this.props.data.position === "right" ? (
+              <Steps.Step
+                title="Draw horizontal line"
+                description="Choose the start and end point of the white line near the traffic light"
+              />
+            ) : (
+              <Steps.Step
+                title="Draw inspecting area"
+                description="Choose the start and end point of the lower bound of inspecting area"
+              />
+            )}
             {this.props.data.position === "right" && (
               <Steps.Step
                 title="Draw vertical line"
@@ -218,10 +237,17 @@ class DrawLines extends React.Component {
               title="Draw inspecting area"
               description="Choose the start and end point of the left bound of inspecting area"
             />
-            <Steps.Step
-              title="Draw inspecting area"
-              description="Choose the start and end point of the upper bound of inspecting area"
-            />
+            {this.props.data.position === "right" ? (
+              <Steps.Step
+                title="Draw inspecting area"
+                description="Choose the start and end point of the upper bound of inspecting area"
+              />
+            ) : (
+              <Steps.Step
+                title="Draw horizontal line"
+                description="Choose the start and end point of the white line near the traffic light"
+              />
+            )}
             <Steps.Step
               title="Draw inspecting area"
               description="Choose the start and end point of the right bound of inspecting area"
@@ -237,23 +263,14 @@ class DrawLines extends React.Component {
               fontSize: "16px",
             }}
           >
-            <Popover placement="topLeft" content={<div>Image here</div>}>
-              <FontAwesomeIcon icon={faInfoCircle} />
-            </Popover>
-            {this.props.data.position === "right" && (
-              <Popover placement="topLeft" content={<div>Image here</div>}>
+            {LINE_POSITION[this.props.data.position].map((img) => (
+              <Popover
+                placement="topLeft"
+                content={<img src={img} width={288} height={162} />}
+              >
                 <FontAwesomeIcon icon={faInfoCircle} />
               </Popover>
-            )}
-            <Popover placement="topLeft" content={<div>Image here</div>}>
-              <FontAwesomeIcon icon={faInfoCircle} />
-            </Popover>
-            <Popover placement="topLeft" content={<div>Image here</div>}>
-              <FontAwesomeIcon icon={faInfoCircle} />
-            </Popover>
-            <Popover placement="topLeft" content={<div>Image here</div>}>
-              <FontAwesomeIcon icon={faInfoCircle} />
-            </Popover>
+            ))}
           </div>
           <canvas
             id="canvas"

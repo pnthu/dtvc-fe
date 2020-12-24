@@ -15,6 +15,9 @@ class Body extends React.Component {
     super(props);
     this.login = this.login.bind(this);
     this.login = this.login.bind(this);
+    this.state = {
+      error: null,
+    };
   }
 
   login = (data) => {
@@ -28,7 +31,11 @@ class Body extends React.Component {
     })
       .then((Response) => Response.json())
       .then((user) => {
-        if (user.status === "active") {
+        if (user === null) {
+          this.setState({
+            error: "Wrong username or password. Please try again.",
+          });
+        } else if (user.status === "active") {
           window.sessionStorage.setItem("role", user.role.name);
           window.sessionStorage.setItem("fullname", user.fullname);
           window.sessionStorage.setItem("username", user.username);
@@ -37,6 +44,11 @@ class Body extends React.Component {
           } else if (user.role.name === "admin") {
             this.props.history.push("/accounts");
           }
+        } else {
+          this.setState({
+            error:
+              "This account has been deactivated. Please contact the administrator.",
+          });
         }
       })
       .catch((error) => {
@@ -83,7 +95,9 @@ class Body extends React.Component {
           <Route
             path="/"
             exact
-            component={() => <Login login={this.login} />}
+            component={() => (
+              <Login login={this.login} error={this.state.error} />
+            )}
           />
           <Route path="/confirm" component={ActivateAccount} />
         </Switch>

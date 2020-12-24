@@ -4,7 +4,7 @@ import moment from "moment";
 import { Table, Button, Select, DatePicker, notification } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
-import "./recordManagement.css";
+import "./RecordManagement.css";
 import RecordDetail from "./RecordDetail";
 
 class RecordManagement extends React.Component {
@@ -23,6 +23,7 @@ class RecordManagement extends React.Component {
       fromDate: moment().startOf("isoWeek").format("yyyy-MM-DD"),
       toDate: moment().endOf("isoWeek").format("yyyy-MM-DD"),
       mode: "view",
+      loading: false,
     };
   }
 
@@ -38,11 +39,13 @@ class RecordManagement extends React.Component {
       dataIndex: ["violationType", "name"],
       key: "type",
       ellipsis: true,
+      width: "22%",
     },
     {
       title: "License Plate Number",
       dataIndex: "licensePlate",
       key: "licensePlateNumber",
+      width: "16%",
     },
     {
       title: "Recorded Time",
@@ -50,14 +53,16 @@ class RecordManagement extends React.Component {
       key: "time",
       ellipsis: true,
       render: (text) => {
-        return moment(text).format("DD/MM/yyyy");
+        return moment(text).format("DD/MM/yyyy HH:mm:ss");
       },
+      width: "18%",
     },
     {
       title: "Location",
       dataIndex: "location",
       key: "location",
       ellipsis: true,
+      width: "15%",
     },
     {
       title: "Status",
@@ -75,6 +80,7 @@ class RecordManagement extends React.Component {
         };
         return titleCase(text);
       },
+      width: "12%",
     },
     {
       title: "View Details",
@@ -95,6 +101,7 @@ class RecordManagement extends React.Component {
           </Button>
         </>
       ),
+      width: "12%",
     },
   ];
 
@@ -161,23 +168,25 @@ class RecordManagement extends React.Component {
   };
 
   onSelectedType = (value, option) => {
-    this.setState({ selectedType: value });
+    this.setState({ selectedType: value, loading: true });
     this.filter(
       `${this.state.fromDate} 00:00:00`,
       `${this.state.toDate} 23:59:59`,
       value,
       this.state.selectedStatus
     );
+    this.setState({ loading: false });
   };
 
   onSelectedStatus = (value, option) => {
-    this.setState({ selectedStatus: value });
+    this.setState({ selectedStatus: value, loading: true });
     this.filter(
       `${this.state.fromDate} 00:00:00`,
       `${this.state.toDate} 23:59:59`,
       this.state.selectedType,
       value
     );
+    this.setState({ loading: false });
   };
 
   onSelectedDates = (dates, dateStrings) => {
@@ -187,6 +196,7 @@ class RecordManagement extends React.Component {
       this.setState({
         fromDate: from,
         toDate: to,
+        loading: true,
       });
       this.filter(
         `${from} 00:00:00`,
@@ -194,6 +204,7 @@ class RecordManagement extends React.Component {
         this.state.selectedType,
         this.state.selectedStatus
       );
+      this.setState({ loading: false });
     }
   };
 
@@ -206,19 +217,21 @@ class RecordManagement extends React.Component {
   };
 
   componentDidMount = () => {
+    this.setState({ loading: true });
     this.fetchViolationTypes();
     // this.fetchAllCases();
     this.filter();
+    this.setState({ loading: false });
   };
 
   addNumberIndex = (caseList) => {
     let index = 1;
     for (let i = 0; i < caseList.length; i++) {
-        caseList[i]['No'] = index;
-        index++;
+      caseList[i]["No"] = index;
+      index++;
     }
     return caseList;
-  }
+  };
 
   updateLicense = (number, data) => {
     fetch(
@@ -246,8 +259,10 @@ class RecordManagement extends React.Component {
         return Response.json();
       })
       .then((data) => {
-        this.fetchAllCases();
+        this.setState({ loading: true });
+        this.filter();
         this.setState({ visible: true, record: data });
+        this.setState({ loading: false });
       });
   };
 
@@ -305,6 +320,7 @@ class RecordManagement extends React.Component {
                 className="table"
                 dataSource={this.state.data}
                 columns={this.columns}
+                loading={this.state.loading}
               />
             </div>
           </div>

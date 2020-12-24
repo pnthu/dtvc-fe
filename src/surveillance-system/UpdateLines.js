@@ -1,13 +1,28 @@
 import * as React from "react";
-import { Steps, Button, notification } from "antd";
+import { Steps, Button, Popover, notification } from "antd";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const LINE_TYPE = [
-  { label: "line1", value: "Horzontal line" },
-  { label: "line2", value: "Vertical Line" },
-  { label: "line3", value: "Left bound" },
-  { label: "line4", value: "Upper bound" },
-  { label: "line5", value: "Right bound" },
-];
+const LINE_TYPE = {
+  left: ["horizontal", "left_bound", "upper_bound", "right_bound"],
+  right: ["horizontal", "vertical", "left_bound", "upper_bound", "right_bound"],
+};
+
+const LINE_POSITION = {
+  left: [
+    require("../image/left-horizontal.jpg"),
+    require("../image/left-left.jpg"),
+    require("../image/left-upper.jpg"),
+    require("../image/left-right.jpg"),
+  ],
+  right: [
+    require("../image/right-horizontal.jpg"),
+    require("../image/right-vertical.jpg"),
+    require("../image/right-left.jpg"),
+    require("../image/right-upper.jpg"),
+    require("../image/right-right.jpg"),
+  ],
+};
 
 class UpdateLines extends React.Component {
   constructor(props) {
@@ -27,30 +42,30 @@ class UpdateLines extends React.Component {
     var point = {};
   }
 
-  // updateCamera = (body) => {
-  //   fetch(`http://localhost:8080/camera/update`, {
-  //     method: "POST",
-  //     headers: {
-  //       Accept: "application/json",
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(body),
-  //   }).then((Response) => {
-  //     if (Response.status === 200) {
-  //       notification.success({
-  //         message: "Update camera succcessfully!",
-  //         placement: "bottomLeft",
-  //       });
-  //       this.props.onCancel();
-  //       window.location.reload();
-  //     } else {
-  //       notification.error({
-  //         message: "Update camera failed!",
-  //         placement: "bottomLeft",
-  //       });
-  //     }
-  //   });
-  // };
+  updateCamera = (body) => {
+    fetch(`http://localhost:8080/camera/update`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    }).then((Response) => {
+      if (Response.status === 200) {
+        notification.success({
+          message: "Update camera succcessfully!",
+          placement: "bottomLeft",
+        });
+        this.props.onCancel();
+        window.location.reload();
+      } else {
+        notification.error({
+          message: "Update camera failed!",
+          placement: "bottomLeft",
+        });
+      }
+    });
+  };
 
   drawPoint = (evt) => {
     if (this.state.context) {
@@ -100,7 +115,7 @@ class UpdateLines extends React.Component {
     this.setState({ mouseDown: false });
   };
 
-  handleCreate = () => {
+  handleUpdate = () => {
     //resize
     let tmp = [];
     let point = {};
@@ -111,12 +126,21 @@ class UpdateLines extends React.Component {
       let tmpPoint = {};
       tmpPoint.x = point.x * 3;
       tmpPoint.y = point.y * 3;
+      if (this.props.data.position === "right") {
+        tmpPoint.x = point.x * 4;
+        tmpPoint.y = point.y * 4;
+      } else {
+        tmpPoint.x = point.x * 3;
+        tmpPoint.y = point.y * 3;
+      }
       tmp.push(tmpPoint);
     }
     //map array
-    for (let i = 0; i < 5; i++) {
+    const maxPoint = this.props.data.position === "right" ? 10 : 8;
+    for (let i = 0; i < maxPoint; i += 2) {
       let line = {};
-      line.lineType = LINE_TYPE[i].value;
+      line.lineId = this.props.data.lines[i / 2].lineId;
+      line.lineType = LINE_TYPE[this.props.data.position][i / 2];
       line.top = tmp[i].y;
       line.left = tmp[i].x;
       line.right = tmp[i + 1].x;
@@ -125,22 +149,22 @@ class UpdateLines extends React.Component {
         case 0:
           tmpObj.line1 = line;
           break;
-        case 1:
+        case 2:
           tmpObj.line2 = line;
           break;
-        case 2:
+        case 4:
           tmpObj.line3 = line;
           break;
-        case 3:
+        case 6:
           tmpObj.line4 = line;
           break;
-        case 4:
+        case 8:
           tmpObj.line5 = line;
           break;
       }
     }
     console.log("result", tmpObj);
-    this.createCamera(tmpObj);
+    this.updateCamera(tmpObj);
   };
 
   clearAll = () => {
@@ -213,10 +237,12 @@ class UpdateLines extends React.Component {
               title="Draw horizontal line"
               description="Choose the start and end point of the white line near the traffic light"
             />
-            <Steps.Step
-              title="Draw vertical line"
-              description="Choose the start and end point of the broken white lane line"
-            />
+            {this.props.data.position === "right" && (
+              <Steps.Step
+                title="Draw vertical line"
+                description="Choose the start and end point of the broken white lane line"
+              />
+            )}
             <Steps.Step
               title="Draw inspecting area"
               description="Choose the start and end point of the left bound of inspecting area"
@@ -230,6 +256,25 @@ class UpdateLines extends React.Component {
               description="Choose the start and end point of the right bound of inspecting area"
             />
           </Steps>
+          <div
+            style={{
+              display: "grid",
+              position: "relative",
+              top: "4px",
+              left: "-320px",
+              color: "#c0c0c0",
+              fontSize: "16px",
+            }}
+          >
+            {LINE_POSITION[this.props.data.position].map((img) => (
+              <Popover
+                placement="topLeft"
+                content={<img src={img} width={288} height={162} />}
+              >
+                <FontAwesomeIcon icon={faInfoCircle} />
+              </Popover>
+            ))}
+          </div>
           <canvas
             id="canvas"
             ref={this.canvasRef}
@@ -257,7 +302,7 @@ class UpdateLines extends React.Component {
             <Button onClick={this.props.prev} style={{ marginRight: "8px" }}>
               Previous
             </Button>
-            <Button type="primary" onClick={this.handleCreate}>
+            <Button type="primary" onClick={this.handleUpdate}>
               Update
             </Button>
           </div>

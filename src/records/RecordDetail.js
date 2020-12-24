@@ -1,5 +1,13 @@
 import * as React from "react";
-import { Modal, Button, Form, AutoComplete, Input, notification } from "antd";
+import {
+  Modal,
+  Button,
+  Form,
+  AutoComplete,
+  Input,
+  notification,
+  Spin,
+} from "antd";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
@@ -17,6 +25,7 @@ class RecordDetail extends React.Component {
       mode: MODE.VIEW,
       confirmVisible: false,
       licenses: [],
+      loading: true,
     };
   }
 
@@ -94,7 +103,7 @@ class RecordDetail extends React.Component {
   };
 
   handleReject = () => {
-    this.approveCase();
+    this.rejectCase();
     this.props.onClose();
     window.location.reload();
   };
@@ -242,13 +251,16 @@ class RecordDetail extends React.Component {
               </p>
             </div>
           </div>
-          <img
-            src={this.props.data.image.url}
-            alt="Record"
-            width={533}
-            height={300}
-            style={{ marginBottom: "24px" }}
-          />
+          <Spin spinning={this.state.loading}>
+            <img
+              src={this.props.data.image.url}
+              alt="Record"
+              width={533}
+              height={300}
+              style={{ marginBottom: "24px" }}
+              onLoad={() => this.setState({ loading: false })}
+            />
+          </Spin>
           <div>{actions[this.props.data.caseType]}</div>
         </Modal>
         <Modal visible={this.state.confirmVisible}>

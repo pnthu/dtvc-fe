@@ -1,5 +1,7 @@
 import * as React from "react";
-import { Drawer, Steps, Button, Form, Input, Select } from "antd";
+import { Drawer, Steps, Button, Form, Input, Select, Popover } from "antd";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import UpdateLines from "./UpdateLines";
 
 class UpdateCameraModal extends React.Component {
@@ -16,6 +18,7 @@ class UpdateCameraModal extends React.Component {
       existedGroup: true,
       groupCamera: null,
       image: "",
+      positionImage: null,
     };
     this.formRef = React.createRef();
   }
@@ -112,7 +115,7 @@ class UpdateCameraModal extends React.Component {
   onFinish = (values) => {
     const next = this.state.current + 1;
     const info = this.state.data;
-    info.status = "Active";
+    info.status = "active";
     info.location = values.location;
     info.connectionUrl = values.connectionUrl;
     info.position = values.position;
@@ -141,6 +144,10 @@ class UpdateCameraModal extends React.Component {
     } else {
       this.setState({ selectedGroup: { groupId: 0, groupName: value } });
     }
+  };
+
+  onPositionChange = (value, option) => {
+    this.setState({ positionImage: value });
   };
 
   prev = () => {
@@ -264,7 +271,11 @@ class UpdateCameraModal extends React.Component {
                     { required: true, message: "Please input camera position" },
                   ]}
                 >
-                  <Select placeholder="Position" style={{ textAlign: "left" }}>
+                  <Select
+                    placeholder="Position"
+                    style={{ textAlign: "left", width: "95%" }}
+                    onChange={this.onPositionChange}
+                  >
                     {this.state.existedPosition === null ? (
                       <>
                         <Select.Option value="left">Left</Select.Option>
@@ -290,11 +301,39 @@ class UpdateCameraModal extends React.Component {
                 const tmp = !this.state.existedGroup;
                 this.setState({ existedGroup: tmp });
               }}
+              style={{ position: "absolute", left: "70px", top: "260px" }}
             >
               {this.state.existedGroup
                 ? "Create new group"
                 : "Use existed group"}
             </Button>
+            <Popover
+              placement="bottomRight"
+              content={
+                this.state.positionImage && (
+                  <img
+                    src={
+                      this.state.positionImage === "left"
+                        ? require("../image/left-camera.png")
+                        : require("../image/right-camera.png")
+                    }
+                    width={205}
+                    height={112}
+                  />
+                )
+              }
+            >
+              <FontAwesomeIcon
+                icon={faInfoCircle}
+                style={{
+                  marginLeft: "10px",
+                  position: "absolute",
+                  right: "12px",
+                  top: "230px",
+                  color: "#bbbbbb",
+                }}
+              />
+            </Popover>
           </>
         )}
         {this.state.current === 1 && (
