@@ -154,7 +154,7 @@ class CameraManagement extends React.Component {
     )
       .then((Response) => Response.json())
       .then((cameras) => {
-        this.setState({ data: cameras });
+        this.setState({ data: this.addNumberIndex(cameras) });
       })
       .catch((error) => {
         console.log(error);
@@ -172,7 +172,7 @@ class CameraManagement extends React.Component {
         },
       }
     ).then((Response) => {
-      if (status === "Active") {
+      if (status === "active") {
         if (Response.status === 200) {
           notification.success({
             message: "Activate Camera Successfully!",

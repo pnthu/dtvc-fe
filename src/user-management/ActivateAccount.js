@@ -11,7 +11,7 @@ class ActivateAccount extends React.Component {
       username: "",
       password: "",
       token: "",
-      status: "Active",
+      status: "active",
       pageState: "",
     };
   }
@@ -105,15 +105,44 @@ class ActivateAccount extends React.Component {
                 <Form.Item
                   label="Password"
                   name="password"
-                  rules={[{ required: true, message: "Please input password" }]}
+                  rules={[
+                    { required: true, message: "Please input password" },
+                    {
+                      min: 8,
+                      message: "Password cannot be less than 8 characters",
+                    },
+                    {
+                      pattern: new RegExp(/[A-Za-z]+[0-9]+|[0-9]+[A-Za-z]+/g),
+                      message: "Password must contain letters and numbers",
+                    },
+                  ]}
                 >
-                  <Input.Password placeholder="New password" />
+                  <Input.Password placeholder="Password" />
                 </Form.Item>
                 <Form.Item
                   label="Confirm password"
                   name="confirmPassword"
+                  dependencies={["password"]}
                   rules={[
                     { required: true, message: "Please confirm your password" },
+                    {
+                      min: 8,
+                      message: "Password cannot be less than 8 characters",
+                    },
+                    {
+                      pattern: new RegExp(/[A-Za-z]+[0-9]+|[0-9]+[A-Za-z]+/g),
+                      message: "Password must contain letters and numbers",
+                    },
+                    ({ getFieldValue }) => ({
+                      validator(rule, value) {
+                        if (!value || getFieldValue("password") === value) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(
+                          "The two passwords that you entered do not match!"
+                        );
+                      },
+                    }),
                   ]}
                 >
                   <Input.Password placeholder="Confirm password" />

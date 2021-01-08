@@ -45,6 +45,11 @@ class RecordDetail extends React.Component {
           message: "Approve case succcessfully!",
           placement: "bottomLeft",
         });
+      } else if (Response.status === 400) {
+        notification.error({
+          message: "You cannot approve the same motorbike within 30 minutes",
+          placement: "bottomLeft",
+        });
       } else {
         notification.error({
           message: "Approve case failed!",

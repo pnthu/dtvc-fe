@@ -282,6 +282,7 @@ class RecordManagement extends React.Component {
             <h2 className="title">Records Management</h2>
             <div className="filter">
               <DatePicker.RangePicker
+                allowClear={false}
                 placeholder={["From", "To"]}
                 format="DD/MM/yyyy"
                 onChange={this.onSelectedDates}

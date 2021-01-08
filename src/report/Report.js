@@ -84,7 +84,11 @@ class Report extends React.Component {
               There {type.approved > 1 ? "are" : "is"} {type.rejected} rejected{" "}
               {type.approved > 1 ? "cases" : "case"} but not trained yet.
             </div>
-            <Button type="primary" style={{ marginTop: "12px" }}>
+            <Button
+              type="primary"
+              style={{ marginTop: "12px" }}
+              disabled={true}
+            >
               Train All
             </Button>
           </div>

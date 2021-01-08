@@ -38,6 +38,7 @@ class UpdateLines extends React.Component {
       currentStep: 0,
       data: {},
       init: true,
+      disabled: false,
     };
     var point = {};
   }
@@ -98,10 +99,47 @@ class UpdateLines extends React.Component {
     ctx.lineTo(this.state.points[pos - 1].x, this.state.points[pos - 1].y);
     ctx.stroke();
     ctx.closePath();
-    if (this.state.currentStep !== 4) {
+    if (
+      (this.props.data.position === "right" && this.state.currentStep !== 4) ||
+      (this.props.data.position === "left" && this.state.currentStep !== 3)
+    ) {
       const next = this.state.currentStep + 1;
       this.setState({ currentStep: next });
+    } else {
+      this.setState({ disabled: false });
     }
+  };
+
+  undo = () => {
+    //draw image
+    const ctx = this.state.context;
+    this.props.data.position === "right"
+      ? ctx.clearRect(0, 0, 672, 380)
+      : ctx.clearRect(0, 0, 640, 360);
+    const img = new Image();
+    img.onload = () => {
+      if (this.props.data.position === "right") {
+        ctx.drawImage(img, 0, 0, 672, 380);
+      } else {
+        ctx.drawImage(img, 0, 0, 640, 360);
+      }
+      //pop 2 points
+      const newPoints = this.state.points.slice(
+        0,
+        this.state.points.length - 2
+      );
+      this.setState({ points: newPoints, currentStep: newPoints.length / 2 });
+      //draw again
+      for (let i = 0; i < newPoints.length; i += 2) {
+        ctx.beginPath();
+        ctx.strokeStyle = "#f00";
+        ctx.lineWidth = 3;
+        ctx.moveTo(newPoints[i].x, newPoints[i].y);
+        ctx.lineTo(newPoints[i + 1].x, newPoints[i + 1].y);
+        ctx.stroke();
+      }
+    };
+    img.src = `data:image/png;base64, ${this.props.image.frame}`;
   };
 
   handleMouseDown = (evt) => {
@@ -116,65 +154,78 @@ class UpdateLines extends React.Component {
   };
 
   handleUpdate = () => {
-    //resize
-    let tmp = [];
-    let point = {};
-    let tmpObj = {};
-    tmpObj.camera = this.state.data;
-    for (let i = 0; i < this.state.points.length; i++) {
-      point = this.state.points[i];
-      let tmpPoint = {};
-      tmpPoint.x = point.x * 3;
-      tmpPoint.y = point.y * 3;
-      if (this.props.data.position === "right") {
-        tmpPoint.x = point.x * 4;
-        tmpPoint.y = point.y * 4;
-      } else {
+    //check if lines has changed
+    if (this.state.points.length === 0) {
+      this.updateCamera({ camera: this.state.data, ...this.props.data.lines });
+    } else {
+      //resize
+      let tmp = [];
+      let point = {};
+      let tmpObj = {};
+      tmpObj.camera = this.state.data;
+      for (let i = 0; i < this.state.points.length; i++) {
+        point = this.state.points[i];
+        let tmpPoint = {};
         tmpPoint.x = point.x * 3;
         tmpPoint.y = point.y * 3;
+        if (this.props.data.position === "right") {
+          tmpPoint.x = point.x * 4;
+          tmpPoint.y = point.y * 4;
+        } else {
+          tmpPoint.x = point.x * 3;
+          tmpPoint.y = point.y * 3;
+        }
+        tmp.push(tmpPoint);
       }
-      tmp.push(tmpPoint);
-    }
-    //map array
-    const maxPoint = this.props.data.position === "right" ? 10 : 8;
-    for (let i = 0; i < maxPoint; i += 2) {
-      let line = {};
-      line.lineId = this.props.data.lines[i / 2].lineId;
-      line.lineType = LINE_TYPE[this.props.data.position][i / 2];
-      line.top = tmp[i].y;
-      line.left = tmp[i].x;
-      line.right = tmp[i + 1].x;
-      line.bottom = tmp[i + 1].y;
-      switch (i) {
-        case 0:
-          tmpObj.line1 = line;
-          break;
-        case 2:
-          tmpObj.line2 = line;
-          break;
-        case 4:
-          tmpObj.line3 = line;
-          break;
-        case 6:
-          tmpObj.line4 = line;
-          break;
-        case 8:
-          tmpObj.line5 = line;
-          break;
+      //map array
+      const maxPoint = this.props.data.position === "right" ? 10 : 8;
+      for (let i = 0; i < maxPoint; i += 2) {
+        let line = {};
+        line.lineId = this.props.data.lines[i / 2].lineId;
+        line.lineType = LINE_TYPE[this.props.data.position][i / 2];
+        line.top = tmp[i].y;
+        line.left = tmp[i].x;
+        line.right = tmp[i + 1].x;
+        line.bottom = tmp[i + 1].y;
+        switch (i) {
+          case 0:
+            tmpObj.line1 = line;
+            break;
+          case 2:
+            tmpObj.line2 = line;
+            break;
+          case 4:
+            tmpObj.line3 = line;
+            break;
+          case 6:
+            tmpObj.line4 = line;
+            break;
+          case 8:
+            tmpObj.line5 = line;
+            break;
+        }
       }
+      this.updateCamera(tmpObj);
     }
-    console.log("result", tmpObj);
-    this.updateCamera(tmpObj);
   };
 
   clearAll = () => {
     const ctx = this.state.context;
-    ctx.clearRect(0, 0, 672, 380);
+    this.props.data.position === "right"
+      ? ctx.clearRect(0, 0, 672, 380)
+      : ctx.clearRect(0, 0, 640, 360);
     const img = new Image();
     img.src = `data:image/png;base64, ${this.props.image.frame}`;
     img.onload = () => {
-      ctx.drawImage(img, 0, 0, 672, 380);
+      this.props.data.position === "right"
+        ? ctx.drawImage(img, 0, 0, 672, 380)
+        : ctx.drawImage(img, 0, 0, 640, 360);
     };
+    this.setState({ currentStep: 0, disabled: true });
+  };
+
+  prev = () => {
+    this.props.prev({ lines: this.state.data.lines, ...this.state.data });
   };
 
   componentDidMount = () => {
@@ -219,12 +270,14 @@ class UpdateLines extends React.Component {
           ctx.stroke();
         }
       };
-      this.setState({ init: false });
+      this.setState({
+        init: false,
+        currentStep: this.props.data.position === "right" ? 4 : 3,
+      });
     }
   };
 
   render() {
-    console.log("data", this.props.data);
     return (
       <>
         <div className="next-step">
@@ -293,16 +346,25 @@ class UpdateLines extends React.Component {
           }}
         >
           <div>
-            {/* <Button type="primary" style={{ marginRight: "8px" }}>
+            <Button
+              type="primary"
+              style={{ marginRight: "8px" }}
+              onClick={this.undo}
+              disabled={this.state.currentStep === 0}
+            >
               Undo
-            </Button> */}
+            </Button>
             <Button onClick={this.clearAll}>Clear All</Button>
           </div>
           <div>
-            <Button onClick={this.props.prev} style={{ marginRight: "8px" }}>
+            <Button onClick={this.prev} style={{ marginRight: "8px" }}>
               Previous
             </Button>
-            <Button type="primary" onClick={this.handleUpdate}>
+            <Button
+              type="primary"
+              onClick={this.handleUpdate}
+              disabled={this.state.disabled}
+            >
               Update
             </Button>
           </div>

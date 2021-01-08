@@ -27,7 +27,7 @@ class Login extends React.Component {
             {this.props.error}
           </Typography.Text>
         )}
-        <Form name="basic" style={{ width: "50%" }} onFinish={this.login}>
+        <Form name="basic" style={{ width: "40%" }} onFinish={this.login}>
           <Form.Item
             name="username"
             rules={[{ required: true, message: "Please input your username" }]}

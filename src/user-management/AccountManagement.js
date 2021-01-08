@@ -22,16 +22,19 @@ class AccountManagement extends React.Component {
       title: "Email",
       dataIndex: "username",
       key: "email",
+      width: "40%",
     },
     {
       title: "Fullname",
       dataIndex: "fullname",
       key: "fullname",
+      width: "30%",
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      width: "30%",
       render: (text, record) => {
         let self = this;
         return (
@@ -153,9 +156,9 @@ class AccountManagement extends React.Component {
     let newStatus;
     let record = this.tempRecord;
     if (checked) {
-      newStatus = "Active";
+      newStatus = "active";
     } else {
-      newStatus = "Inactive";
+      newStatus = "inactive";
     }
     record.status = newStatus;
     await this.updateStatus(record);
@@ -188,8 +191,8 @@ class AccountManagement extends React.Component {
                   onChange={this.onSelectedStatus}
                 >
                   <Select.Option value="">All Status</Select.Option>
-                  <Select.Option value="Active">Active</Select.Option>
-                  <Select.Option value="Inactive">Inactive</Select.Option>
+                  <Select.Option value="active">Active</Select.Option>
+                  <Select.Option value="inactive">Inactive</Select.Option>
                 </Select>
               </div>
               <div className="new-btn">

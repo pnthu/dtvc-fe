@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Modal, Button, Form, Input, notification } from "antd";
+import { Modal, Button, Form, Input, Typography, notification } from "antd";
 import "./AccountManagementModal.css";
 
 class AccountManagementModal extends React.Component {
@@ -16,6 +16,7 @@ class AccountManagementModal extends React.Component {
           name: "moderator",
         },
       },
+      error: null,
     };
   }
 
@@ -27,6 +28,22 @@ class AccountManagementModal extends React.Component {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(this.state.info),
+    }).then((Response) => {
+      if (Response.status === 200) {
+        notification.success({
+          message: "Create user succcessfully!",
+          placement: "bottomLeft",
+        });
+        this.props.onCancel();
+        window.location.reload();
+      } else if (Response.status === 400) {
+        this.setState({ error: "This email has been used" });
+      } else {
+        notification.error({
+          message: "Create camera failed!",
+          placement: "bottomLeft",
+        });
+      }
     });
   };
 
@@ -36,11 +53,6 @@ class AccountManagementModal extends React.Component {
     temp.fullname = values.fullname;
     this.setState({ info: temp });
     this.createUser();
-    this.props.onCancel();
-    notification.success({
-      message: "Created Successfully!",
-      placement: "bottomLeft",
-    });
   };
 
   onFinishFailed = (errorInfo) => {
@@ -67,7 +79,13 @@ class AccountManagementModal extends React.Component {
             <Form.Item
               label="Email"
               name="email"
-              rules={[{ required: true, message: "Please input email" }]}
+              rules={[
+                { required: true, message: "Please input email" },
+                {
+                  type: "email",
+                  message: "Please enter a valid email address",
+                },
+              ]}
             >
               <Input type="email" placeholder="Email" />
             </Form.Item>
@@ -78,6 +96,11 @@ class AccountManagementModal extends React.Component {
             >
               <Input placeholder="Fullname" />
             </Form.Item>
+            {this.state.error !== null && (
+              <Typography.Text type="danger">
+                {this.state.error}
+              </Typography.Text>
+            )}
             <Form.Item>
               <Button type="primary" htmlType="submit" className="login">
                 Create

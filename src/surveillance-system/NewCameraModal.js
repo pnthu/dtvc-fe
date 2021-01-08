@@ -1,5 +1,14 @@
 import * as React from "react";
-import { Drawer, Steps, Button, Form, Input, Select, Popover } from "antd";
+import {
+  Drawer,
+  Steps,
+  Button,
+  Form,
+  Input,
+  Select,
+  Popover,
+  Typography,
+} from "antd";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./NewCameraModal.css";
@@ -8,6 +17,7 @@ import DrawLines from "./DrawLines";
 class NewCameraModal extends React.Component {
   constructor(props) {
     super(props);
+    this.formRef = React.createRef();
     this.state = {
       current: 0,
       data: null,
@@ -19,6 +29,8 @@ class NewCameraModal extends React.Component {
       existedGroup: true,
       image: "",
       positionImage: null,
+      error: null,
+      groupCamera: null,
     };
   }
 
@@ -81,20 +93,53 @@ class NewCameraModal extends React.Component {
       });
   };
 
-  onFinish = (values) => {
-    const next = this.state.current + 1;
-    const info = values;
-    const image = {};
-    image.cameraUrl = info.connectionUrl;
-    this.getImageFromCamera(image);
-    info.status = "active";
-    if (!this.state.existedGroup) {
-      this.setState({
-        selectedGroup: { groupId: 0, groupName: values.groupCamera },
+  checkGroup = (values) => {
+    fetch(
+      `http://localhost:8080/camera/checkGroup?name=${values.groupCamera}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((Response) => Response.json())
+      .then((matched) => {
+        if (matched) {
+          this.setState({ error: "This group name has been used" });
+        } else {
+          this.setState({
+            selectedGroup: { groupId: 0, groupName: values.groupCamera },
+          });
+          const next = this.state.current + 1;
+          const info = values;
+          const image = {};
+          image.cameraUrl = info.connectionUrl;
+          this.getImageFromCamera(image);
+          info.status = "active";
+          info.groupCamera = this.state.selectedGroup;
+          this.setState({ current: next, data: info });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
       });
+  };
+
+  onFinish = (values) => {
+    if (!this.state.existedGroup) {
+      this.checkGroup(values);
+    } else {
+      const next = this.state.current + 1;
+      const info = values;
+      const image = {};
+      image.cameraUrl = info.connectionUrl;
+      this.getImageFromCamera(image);
+      info.status = "active";
+      info.groupCamera = this.state.selectedGroup;
+      this.setState({ current: next, data: info });
     }
-    info.groupCamera = this.state.selectedGroup;
-    this.setState({ current: next, data: info });
   };
 
   onSelectedGroup = (value, option) => {
@@ -105,8 +150,6 @@ class NewCameraModal extends React.Component {
         }
       });
       this.getGroup(value);
-    } else {
-      this.setState({ selectedGroup: { groupId: 0, groupName: value } });
     }
   };
 
@@ -114,9 +157,19 @@ class NewCameraModal extends React.Component {
     this.setState({ positionImage: value });
   };
 
-  prev = () => {
+  prev = (data) => {
     const prev = this.state.current - 1;
-    this.setState({ current: prev });
+    let copyCamera = {};
+    copyCamera = Object.assign({}, data);
+    delete copyCamera.groupCamera;
+    const existedGroup = this.state.existedGroup;
+    const groupId = data.groupCamera.groupName;
+    this.setState({
+      current: prev,
+      data: copyCamera,
+      existedPosition: data.position,
+      groupCamera: existedGroup ? data.groupCamera : { groupId: groupId },
+    });
   };
 
   componentDidMount = () => {
@@ -124,12 +177,40 @@ class NewCameraModal extends React.Component {
   };
 
   render() {
+    const check = () => {
+      if (this.state.groups && this.state.groupCamera) {
+        const result = this.state.groups.filter(
+          (group) => group.groupId === this.state.groupCamera.groupId
+        );
+        return result.length === 0;
+      }
+    };
+
     return (
       <Drawer
         height="85vh"
         placement="bottom"
         title="Create a new camera"
-        onClose={this.props.onCancel}
+        onClose={() => {
+          this.setState(
+            {
+              current: 0,
+              data: {
+                location: null,
+                connectionUrl: null,
+                position: null,
+                groupCamera: null,
+              },
+              groupCamera: {},
+            },
+            () => {
+              this.formRef.current.setFieldsValue({
+                ...this.state.data,
+              });
+            }
+          );
+          this.props.onCancel();
+        }}
         visible={this.props.visible}
       >
         <div className="steps">
@@ -143,7 +224,13 @@ class NewCameraModal extends React.Component {
             <Form
               name="basic"
               onFinish={this.onFinish}
-              // initialValues={this.state.data}
+              ref={this.formRef}
+              initialValues={{
+                groupCamera: this.state.groupCamera
+                  ? this.state.groupCamera.groupId
+                  : null,
+                ...this.state.data,
+              }}
             >
               <div className="camera-form">
                 <Form.Item
@@ -178,6 +265,11 @@ class NewCameraModal extends React.Component {
                       onChange={this.onSelectedGroup}
                       style={{ textAlign: "left" }}
                       placeholder="Group"
+                      defaultValue={
+                        this.state.groupCamera
+                          ? this.state.groupCamera.groupId
+                          : ""
+                      }
                     >
                       {this.state.groups &&
                         this.state.groups.length !== 0 &&
@@ -186,6 +278,14 @@ class NewCameraModal extends React.Component {
                             {group.groupName}
                           </Select.Option>
                         ))}
+                      {check() ? (
+                        this.state.groupCamera &&
+                        this.state.groupCamera.groupName !== "" ? (
+                          <Select.Option value={this.state.groupCamera.groupId}>
+                            {this.state.groupCamera.groupName}
+                          </Select.Option>
+                        ) : null
+                      ) : null}
                     </Select>
                   ) : (
                     <Input placeholder="Group" />
@@ -222,18 +322,49 @@ class NewCameraModal extends React.Component {
                 </Button>
               </div>
             </Form>
-            <Button
-              type="link"
-              onClick={() => {
-                const tmp = !this.state.existedGroup;
-                this.setState({ existedGroup: tmp });
+            <div
+              style={{
+                position: "absolute",
+                left: "70px",
+                top: "255px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
               }}
-              style={{ position: "absolute", left: "70px", top: "260px" }}
             >
-              {this.state.existedGroup
-                ? "Create new group"
-                : "Use existed group"}
-            </Button>
+              {this.state.error !== null && (
+                <Typography.Text
+                  type="danger"
+                  style={{ textAlign: "left", marginLeft: "15px" }}
+                >
+                  {this.state.error}
+                </Typography.Text>
+              )}
+              <Button
+                type="link"
+                onClick={() => {
+                  const tmp = !this.state.existedGroup;
+                  if (tmp) {
+                    this.setState({ error: null });
+                  }
+                  this.setState(
+                    {
+                      existedGroup: tmp,
+                      existedPosition: null,
+                    },
+                    () => {
+                      this.formRef.current.setFieldsValue({
+                        groupCamera: null,
+                      });
+                    }
+                  );
+                }}
+              >
+                {this.state.existedGroup
+                  ? "Create new group"
+                  : "Use existed group"}
+              </Button>
+            </div>
             <Popover
               placement="bottomRight"
               content={

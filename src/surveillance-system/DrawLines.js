@@ -38,6 +38,7 @@ class DrawLines extends React.Component {
       currentStep: 0,
       data: {},
       init: true,
+      disabled: true,
     };
     var point = {};
   }
@@ -104,7 +105,41 @@ class DrawLines extends React.Component {
     ) {
       const next = this.state.currentStep + 1;
       this.setState({ currentStep: next });
+    } else {
+      this.setState({ disabled: false });
     }
+  };
+
+  undo = () => {
+    //draw image
+    const ctx = this.state.context;
+    this.props.data.position === "right"
+      ? ctx.clearRect(0, 0, 672, 380)
+      : ctx.clearRect(0, 0, 640, 360);
+    const img = new Image();
+    img.onload = () => {
+      if (this.props.data.position === "right") {
+        ctx.drawImage(img, 0, 0, 672, 380);
+      } else {
+        ctx.drawImage(img, 0, 0, 640, 360);
+      }
+      //pop 2 points
+      const newPoints = this.state.points.slice(
+        0,
+        this.state.points.length - 2
+      );
+      this.setState({ points: newPoints, currentStep: newPoints.length / 2 });
+      //draw again
+      for (let i = 0; i < newPoints.length; i += 2) {
+        ctx.beginPath();
+        ctx.strokeStyle = "#f00";
+        ctx.lineWidth = 3;
+        ctx.moveTo(newPoints[i].x, newPoints[i].y);
+        ctx.lineTo(newPoints[i + 1].x, newPoints[i + 1].y);
+        ctx.stroke();
+      }
+    };
+    img.src = `data:image/png;base64, ${this.props.image.frame}`;
   };
 
   handleMouseDown = (evt) => {
@@ -172,6 +207,10 @@ class DrawLines extends React.Component {
     this.createCamera(tmpObj);
   };
 
+  prev = () => {
+    this.props.prev(this.state.data);
+  };
+
   componentDidMount = () => {
     console.log("props", this.props);
     this.setState({ data: this.props.data });
@@ -188,8 +227,8 @@ class DrawLines extends React.Component {
   };
 
   componentDidUpdate = () => {
+    const ctx = this.state.context;
     if (this.props.image.frame && this.state.init) {
-      const ctx = this.state.context;
       const img = new Image();
       img.src = `data:image/png;base64, ${this.props.image.frame}`;
       if (this.props.data.position === "right") {
@@ -281,9 +320,23 @@ class DrawLines extends React.Component {
             onMouseDown={(evt) => this.handleMouseDown(evt)}
           ></canvas>
         </div>
+        <Button
+          type="primary"
+          style={{ marginRight: "8px" }}
+          onClick={this.undo}
+          disabled={this.state.currentStep === 0}
+        >
+          Undo
+        </Button>
         <div style={{ textAlign: "right", marginTop: "24px" }}>
-          <Button onClick={this.props.prev}>Previous</Button>
-          <Button type="primary" onClick={this.handleCreate}>
+          <Button onClick={this.prev} style={{ marginRight: "8px" }}>
+            Previous
+          </Button>
+          <Button
+            type="primary"
+            onClick={this.handleCreate}
+            disabled={this.state.disabled}
+          >
             Create
           </Button>
         </div>
