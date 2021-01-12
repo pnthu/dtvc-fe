@@ -305,13 +305,13 @@ class NewCameraModal extends React.Component {
                   >
                     {this.state.existedPosition === null ? (
                       <>
-                        <Select.Option value="left">Left</Select.Option>
-                        <Select.Option value="right">Right</Select.Option>
+                        <Select.Option value="left">left</Select.Option>
+                        <Select.Option value="right">right</Select.Option>
                       </>
                     ) : this.state.existedPosition === "left" ? (
-                      <Select.Option value="right">Right</Select.Option>
+                      <Select.Option value="right">right</Select.Option>
                     ) : (
-                      <Select.Option value="left">Left</Select.Option>
+                      <Select.Option value="left">left</Select.Option>
                     )}
                   </Select>
                 </Form.Item>

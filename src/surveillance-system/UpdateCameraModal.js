@@ -338,16 +338,16 @@ class UpdateCameraModal extends React.Component {
                     style={{ textAlign: "left", width: "95%" }}
                     onChange={this.onPositionChange}
                   >
-                    {this.state.existedPosition === null ? (
-                      <>
-                        <Select.Option value="left">Left</Select.Option>
-                        <Select.Option value="right">Right</Select.Option>
-                      </>
+                    {/* {this.state.existedPosition === null ? (
+                      <> */}
+                    <Select.Option value="left">left</Select.Option>
+                    <Select.Option value="right">right</Select.Option>
+                    {/* </>
                     ) : this.state.existedPosition === "left" ? (
                       <Select.Option value="right">Right</Select.Option>
                     ) : (
                       <Select.Option value="left">Left</Select.Option>
-                    )}
+                    )} */}
                   </Select>
                 </Form.Item>
               </div>

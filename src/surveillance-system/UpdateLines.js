@@ -39,6 +39,7 @@ class UpdateLines extends React.Component {
       data: {},
       init: true,
       disabled: false,
+      disableUndo: true,
     };
     var point = {};
   }
@@ -69,23 +70,31 @@ class UpdateLines extends React.Component {
   };
 
   drawPoint = (evt) => {
-    if (this.state.context) {
-      const points = this.state.points;
-      const ctx = this.state.context;
-      this.point = {
-        x: evt.nativeEvent.offsetX,
-        y: evt.nativeEvent.offsetY,
-      };
-      console.log("point", this.point);
-      points.push(this.point);
-      this.setState({ points: points });
-      ctx.beginPath();
-      ctx.moveTo(this.point.x, this.point.y);
-      ctx.lineTo(this.point.x + 0.25, this.point.y + 0.25);
-      ctx.strokeStyle = "#f00";
-      ctx.lineWidth = 10;
-      ctx.stroke();
-      ctx.closePath();
+    if (
+      ((this.props.data.position === "right" &&
+        this.state.points.length < 10) ||
+        (this.props.data.position === "left" &&
+          this.state.points.length < 8)) &&
+      !this.state.disableUndo
+    ) {
+      if (this.state.context) {
+        const points = this.state.points;
+        const ctx = this.state.context;
+        this.point = {
+          x: evt.nativeEvent.offsetX,
+          y: evt.nativeEvent.offsetY,
+        };
+        console.log("point", this.point);
+        points.push(this.point);
+        this.setState({ points: points });
+        ctx.beginPath();
+        ctx.moveTo(this.point.x, this.point.y);
+        ctx.lineTo(this.point.x + 0.25, this.point.y + 0.25);
+        ctx.strokeStyle = "#f00";
+        ctx.lineWidth = 10;
+        ctx.stroke();
+        ctx.closePath();
+      }
     }
   };
 
@@ -144,7 +153,13 @@ class UpdateLines extends React.Component {
 
   handleMouseDown = (evt) => {
     this.drawPoint(evt);
-    if (this.state.points.length % 2 === 0 && this.state.points.length <= 10) {
+    if (
+      this.state.points.length % 2 === 0 &&
+      this.state.points.length > 0 &&
+      ((this.props.data.position === "right" &&
+        this.state.points.length <= 10) ||
+        (this.props.data.position === "left" && this.state.points.length <= 8))
+    ) {
       this.drawLine();
     }
   };
@@ -221,7 +236,7 @@ class UpdateLines extends React.Component {
         ? ctx.drawImage(img, 0, 0, 672, 380)
         : ctx.drawImage(img, 0, 0, 640, 360);
     };
-    this.setState({ currentStep: 0, disabled: true });
+    this.setState({ currentStep: 0, disabled: true, disableUndo: false });
   };
 
   prev = () => {
@@ -350,7 +365,7 @@ class UpdateLines extends React.Component {
               type="primary"
               style={{ marginRight: "8px" }}
               onClick={this.undo}
-              disabled={this.state.currentStep === 0}
+              disabled={this.state.currentStep === 0 || this.state.disableUndo}
             >
               Undo
             </Button>
