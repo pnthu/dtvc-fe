@@ -8,6 +8,7 @@ import {
   Select,
   Popover,
   Typography,
+  Spin,
 } from "antd";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -31,6 +32,8 @@ class NewCameraModal extends React.Component {
       positionImage: null,
       error: null,
       groupCamera: null,
+      urlError: null,
+      loading: false,
     };
   }
 
@@ -75,8 +78,8 @@ class NewCameraModal extends React.Component {
       });
   };
 
-  getImageFromCamera = (cameraUrl) => {
-    fetch(`http://localhost:8080/camera/getImageFromCamera`, {
+  getImageFromCamera = async (cameraUrl) => {
+    await fetch(`http://localhost:8080/camera/getImageFromCamera`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -86,40 +89,10 @@ class NewCameraModal extends React.Component {
     })
       .then((Response) => Response.json())
       .then((image) => {
-        this.setState({ image: image });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  checkGroup = (values) => {
-    fetch(
-      `http://localhost:8080/camera/checkGroup?name=${values.groupCamera}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((Response) => Response.json())
-      .then((matched) => {
-        if (matched) {
-          this.setState({ error: "This group name has been used" });
+        if (image.frame === "error") {
+          this.setState({ urlError: "Wrong URL or no internet connection" });
         } else {
-          this.setState({
-            selectedGroup: { groupId: 0, groupName: values.groupCamera },
-          });
-          const next = this.state.current + 1;
-          const info = values;
-          const image = {};
-          image.cameraUrl = info.connectionUrl;
-          this.getImageFromCamera(image);
-          info.status = "active";
-          info.groupCamera = this.state.selectedGroup;
-          this.setState({ current: next, data: info });
+          this.setState({ image: image, urlError: null });
         }
       })
       .catch((error) => {
@@ -127,15 +100,42 @@ class NewCameraModal extends React.Component {
       });
   };
 
-  onFinish = (values) => {
+  checkGroup = async (groupCamera) => {
+    await fetch(`http://localhost:8080/camera/checkGroup?name=${groupCamera}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((Response) => Response.json())
+      .then((matched) => {
+        if (matched) {
+          this.setState({ error: "This group name has been used" });
+        } else {
+          this.setState({
+            error: null,
+            selectedGroup: { groupId: 0, groupName: groupCamera },
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  onFinish = async (values) => {
+    this.setState({ loading: true });
+    const info = values;
     if (!this.state.existedGroup) {
-      this.checkGroup(values);
-    } else {
+      await this.checkGroup(values.groupCamera);
+    }
+    const image = {};
+    image.cameraUrl = info.connectionUrl;
+    await this.getImageFromCamera(image);
+    this.setState({ loading: false });
+    if (this.state.error === null && this.state.urlError === null) {
       const next = this.state.current + 1;
-      const info = values;
-      const image = {};
-      image.cameraUrl = info.connectionUrl;
-      this.getImageFromCamera(image);
       info.status = "active";
       info.groupCamera = this.state.selectedGroup;
       this.setState({ current: next, data: info });
@@ -220,7 +220,7 @@ class NewCameraModal extends React.Component {
           </Steps>
         </div>
         {this.state.current === 0 && (
-          <>
+          <Spin spinning={this.state.loading}>
             <Form
               name="basic"
               onFinish={this.onFinish}
@@ -249,8 +249,27 @@ class NewCameraModal extends React.Component {
                     { required: true, message: "Please input camera URL" },
                   ]}
                 >
-                  <Input placeholder="Camera URL" />
+                  <Input
+                    placeholder="Camera URL"
+                    onChange={(e) => {
+                      if (e.target.value === "") {
+                        this.setState({ urlError: "" });
+                      }
+                    }}
+                  />
                 </Form.Item>
+                {this.state.urlError !== null && (
+                  <Typography.Text
+                    type="danger"
+                    style={{
+                      position: "absolute",
+                      top: "35px",
+                      right: "313px",
+                    }}
+                  >
+                    {this.state.urlError}
+                  </Typography.Text>
+                )}
                 <Form.Item
                   label="Group"
                   name="groupCamera"
@@ -288,7 +307,14 @@ class NewCameraModal extends React.Component {
                       ) : null}
                     </Select>
                   ) : (
-                    <Input placeholder="Group" />
+                    <Input
+                      placeholder="Group"
+                      onChange={(e) => {
+                        if (e.target.value === "") {
+                          this.setState({ error: "" });
+                        }
+                      }}
+                    />
                   )}
                 </Form.Item>
                 <Form.Item
@@ -325,8 +351,8 @@ class NewCameraModal extends React.Component {
             <div
               style={{
                 position: "absolute",
-                left: "70px",
-                top: "255px",
+                left: "46px",
+                top: "115px",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "flex-start",
@@ -386,13 +412,13 @@ class NewCameraModal extends React.Component {
                 style={{
                   marginLeft: "10px",
                   position: "absolute",
-                  right: "12px",
-                  top: "230px",
+                  right: "-10px",
+                  top: "86px",
                   color: "#bbbbbb",
                 }}
               />
             </Popover>
-          </>
+          </Spin>
         )}
         {this.state.current === 1 && (
           <DrawLines

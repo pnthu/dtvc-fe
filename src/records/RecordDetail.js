@@ -155,7 +155,10 @@ class RecordDetail extends React.Component {
           visible={this.props.visible}
           footer={false}
           className="detail-modal"
-          onCancel={this.props.onClose}
+          onCancel={() => {
+            this.setState({ loading: true });
+            this.props.onClose();
+          }}
         >
           <h3 className="title">VIOLATION RECORD</h3>
           <div className="container">

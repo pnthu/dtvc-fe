@@ -264,25 +264,28 @@ class UpdateLines extends React.Component {
       const img = new Image();
       img.src = `data:image/png;base64, ${this.props.image.frame}`;
       img.onload = () => {
-        if (this.props.data.position === "right") {
-          ctx.drawImage(img, 0, 0, 672, 380);
-        } else {
-          ctx.drawImage(img, 0, 0, 640, 360);
-        }
-
-        for (let i = 0; i < lines.length; i++) {
-          ctx.beginPath();
-          //draw line
-          ctx.strokeStyle = "#f00";
-          ctx.lineWidth = 3;
+        if (this.props.originPosition === this.props.data.position) {
           if (this.props.data.position === "right") {
-            ctx.moveTo(lines[i].left / 4, lines[i].top / 4);
-            ctx.lineTo(lines[i].right / 4, lines[i].bottom / 4);
+            ctx.drawImage(img, 0, 0, 672, 380);
           } else {
-            ctx.moveTo(lines[i].left / 3, lines[i].top / 3);
-            ctx.lineTo(lines[i].right / 3, lines[i].bottom / 3);
+            ctx.drawImage(img, 0, 0, 640, 360);
           }
-          ctx.stroke();
+          for (let i = 0; i < lines.length; i++) {
+            ctx.beginPath();
+            //draw line
+            ctx.strokeStyle = "#f00";
+            ctx.lineWidth = 3;
+            if (this.props.data.position === "right") {
+              ctx.moveTo(lines[i].left / 4, lines[i].top / 4);
+              ctx.lineTo(lines[i].right / 4, lines[i].bottom / 4);
+            } else {
+              ctx.moveTo(lines[i].left / 3, lines[i].top / 3);
+              ctx.lineTo(lines[i].right / 3, lines[i].bottom / 3);
+            }
+            ctx.stroke();
+          }
+        } else {
+          this.clearAll();
         }
       };
       this.setState({
