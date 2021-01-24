@@ -471,6 +471,7 @@ class UpdateCameraModal extends React.Component {
             image={this.state.image}
             onCancel={this.props.onCancel}
             originPosition={this.state.originPosition}
+            groupCamera={this.state.groupCamera}
           />
         )}
       </Drawer>

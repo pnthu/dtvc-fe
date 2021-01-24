@@ -171,13 +171,18 @@ class UpdateLines extends React.Component {
   handleUpdate = () => {
     //check if lines has changed
     if (this.state.points.length === 0) {
-      this.updateCamera({ camera: this.state.data, ...this.props.data.lines });
+      this.updateCamera({
+        camera: { ...this.state.data, groupCamera: this.props.groupCamera },
+        ...this.props.data.lines,
+      });
+      console.log("not clear all");
     } else {
       //resize
       let tmp = [];
       let point = {};
       let tmpObj = {};
       tmpObj.camera = this.state.data;
+      tmpObj.camera.groupCamera = this.props.groupCamera;
       for (let i = 0; i < this.state.points.length; i++) {
         point = this.state.points[i];
         let tmpPoint = {};
@@ -221,6 +226,7 @@ class UpdateLines extends React.Component {
         }
       }
       this.updateCamera(tmpObj);
+      console.log("clear all");
     }
   };
 

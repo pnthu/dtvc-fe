@@ -20,17 +20,27 @@ class ChangeProfileModal extends React.Component {
           "Content-Type": "application/json",
         },
       }
-    );
+    ).then((Response) => {
+      if (Response.status === 200) {
+        window.sessionStorage.setItem("fullname", this.state.fullname);
+        notification.success({
+          message: "Change Profile Successfully!",
+          placement: "bottomLeft",
+        });
+        this.props.onCancel();
+        window.location.reload();
+      } else {
+        notification.error({
+          message: "Create Profile Successfully!",
+          placement: "bottomLeft",
+        });
+      }
+    });
   };
 
   onFinish = (values) => {
     this.setState({ fullname: values.fullname });
     this.changeProfile();
-    this.props.onCancel();
-    notification.success({
-      message: "Change Profile Successfully!",
-      placement: "bottomLeft",
-    });
   };
 
   onFinishFailed = (errorInfo) => {
