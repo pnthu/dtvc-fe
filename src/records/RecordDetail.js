@@ -7,6 +7,7 @@ import {
   Input,
   notification,
   Spin,
+  Empty,
 } from "antd";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -124,6 +125,7 @@ class RecordDetail extends React.Component {
   };
 
   render() {
+    console.log("image", this.props.data.image.url);
     let actions = {
       unconfirmed: (
         <div style={{ textAlign: "right" }}>
@@ -259,16 +261,24 @@ class RecordDetail extends React.Component {
               </p>
             </div>
           </div>
-          <Spin spinning={this.state.loading}>
-            <img
-              src={this.props.data.image.url}
-              alt="Record"
-              width={533}
-              height={300}
-              style={{ marginBottom: "24px" }}
-              onLoad={() => this.setState({ loading: false })}
-            />
-          </Spin>
+          {this.props.data.image.url !== null ? (
+            <Spin spinning={this.state.loading}>
+              <img
+                src={this.props.data.image.url}
+                alt="Record"
+                width={533}
+                height={300}
+                style={{ marginBottom: "24px" }}
+                onLoad={() => {
+                  if (this.props.data.image.url !== undefined) {
+                    this.setState({ loading: false });
+                  }
+                }}
+              />
+            </Spin>
+          ) : (
+            <Empty description="The system cannot capture image." />
+          )}
           <div>{actions[this.props.data.caseType]}</div>
         </Modal>
         <Modal visible={this.state.confirmVisible}>

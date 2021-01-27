@@ -148,6 +148,7 @@ class UpdateCameraModal extends React.Component {
           this.setState({
             error: null,
             selectedGroup: { groupId: 0, groupName: groupCamera },
+            groupCamera: { groupId: 0, groupName: groupCamera },
           });
         }
       })

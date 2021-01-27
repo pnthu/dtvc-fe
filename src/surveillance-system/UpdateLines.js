@@ -175,7 +175,6 @@ class UpdateLines extends React.Component {
         camera: { ...this.state.data, groupCamera: this.props.groupCamera },
         ...this.props.data.lines,
       });
-      console.log("not clear all");
     } else {
       //resize
       let tmp = [];
@@ -226,7 +225,6 @@ class UpdateLines extends React.Component {
         }
       }
       this.updateCamera(tmpObj);
-      console.log("clear all");
     }
   };
 
