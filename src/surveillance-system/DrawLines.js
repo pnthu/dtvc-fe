@@ -69,23 +69,31 @@ class DrawLines extends React.Component {
   };
 
   drawPoint = (evt) => {
-    if (this.state.context) {
-      const points = this.state.points;
-      const ctx = this.state.context;
-      this.point = {
-        x: evt.nativeEvent.offsetX,
-        y: evt.nativeEvent.offsetY,
-      };
-      console.log("point", this.point);
-      points.push(this.point);
-      this.setState({ points: points });
-      ctx.beginPath();
-      ctx.moveTo(this.point.x, this.point.y);
-      ctx.lineTo(this.point.x + 0.25, this.point.y + 0.25);
-      ctx.strokeStyle = "#f00";
-      ctx.lineWidth = 10;
-      ctx.stroke();
-      // ctx.closePath();
+    if (
+      ((this.props.data.position === "right" &&
+        this.state.points.length < 10) ||
+        (this.props.data.position === "left" &&
+          this.state.points.length < 8)) &&
+      !this.state.disableUndo
+    ) {
+      if (this.state.context) {
+        const points = this.state.points;
+        const ctx = this.state.context;
+        this.point = {
+          x: evt.nativeEvent.offsetX,
+          y: evt.nativeEvent.offsetY,
+        };
+        console.log("point", this.point);
+        points.push(this.point);
+        this.setState({ points: points });
+        ctx.beginPath();
+        ctx.moveTo(this.point.x, this.point.y);
+        ctx.lineTo(this.point.x + 0.25, this.point.y + 0.25);
+        ctx.strokeStyle = "#f00";
+        ctx.lineWidth = 10;
+        ctx.stroke();
+        // ctx.closePath();
+      }
     }
   };
 

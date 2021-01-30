@@ -125,7 +125,6 @@ class RecordDetail extends React.Component {
   };
 
   render() {
-    console.log("image", this.props.data.image.url);
     let actions = {
       unconfirmed: (
         <div style={{ textAlign: "right" }}>
@@ -136,7 +135,11 @@ class RecordDetail extends React.Component {
           >
             Reject
           </Button>
-          <Button type="primary" onClick={this.handleApprove}>
+          <Button
+            type="primary"
+            onClick={this.handleApprove}
+            disabled={this.props.data.image.url === null}
+          >
             Approve
           </Button>
         </div>

@@ -44,6 +44,7 @@ class Body extends React.Component {
           } else if (user.role.name === "admin") {
             this.props.history.push("/accounts");
           }
+          this.setState({ error: null });
         } else {
           this.setState({
             error:

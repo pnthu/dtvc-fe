@@ -136,7 +136,7 @@ class NewCameraModal extends React.Component {
     this.setState({ loading: false });
     if (this.state.error === null && this.state.urlError === null) {
       const next = this.state.current + 1;
-      info.status = "active";
+      info.status = "inactive";
       info.groupCamera = this.state.selectedGroup;
       this.setState({ current: next, data: info });
     }
