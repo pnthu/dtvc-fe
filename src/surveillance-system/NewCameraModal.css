@@ -11,10 +11,6 @@
   margin-top: 10px;
 }
 
-.ant-modal-content {
-  top: -60px;
-}
-
 .test-row {
   display: flex;
   justify-content: space-between;
@@ -28,5 +24,46 @@
 }
 
 .ant-modal-wrap .ant-modal .ant-modal-content {
-  border-radius: 8px 8px 8px 8px;
+  border-radius: 8px;
+}
+
+.steps {
+  width: 50%;
+  margin-left: 25%;
+  margin-bottom: 30px;
+}
+
+.camera-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.camera-field {
+  display: grid;
+  grid-template-columns: 10% 1fr;
+  gap: 16px;
+  align-items: center;
+  text-align: left;
+}
+
+.ant-steps-item-process .ant-steps-item-icon {
+  background-color: #17608d;
+  border-color: none;
+}
+
+.ant-steps-item-finish .ant-steps-item-icon {
+  border-color: #17608d;
+  color: #17608d;
+}
+
+.next-step {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.ant-btn-primary {
+  background-color: #17608d;
+  border: none;
 }

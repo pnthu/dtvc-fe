@@ -2,13 +2,14 @@
   background-color: #e0e0e0;
   padding: 40px 30px;
   display: flex;
-  align-items: center;
   justify-content: center;
+  height: 100%;
 }
 
 .box {
   background-color: white;
   width: 100%;
+  min-height: 470px;
 }
 
 .title {
@@ -21,9 +22,9 @@
 .filter {
   display: grid;
   gap: 20px;
-  grid-auto-flow: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 45% 38% 17%;
   grid-auto-flow: column;
-  width: 60%;
+  width: 65%;
   margin: 30px;
 }
 

@@ -12,10 +12,9 @@ import {
 } from "antd";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "./NewCameraModal.css";
-import DrawLines from "./DrawLines";
+import UpdateLines from "./UpdateLines";
 
-class NewCameraModal extends React.Component {
+class UpdateCameraModal extends React.Component {
   constructor(props) {
     super(props);
     this.formRef = React.createRef();
@@ -28,10 +27,12 @@ class NewCameraModal extends React.Component {
       groupText: "",
       existedPosition: null,
       existedGroup: true,
+      groupCamera: null,
       image: "",
       positionImage: null,
+      lines: [],
+      originPosition: "",
       error: null,
-      groupCamera: null,
       urlError: null,
       loading: false,
     };
@@ -78,6 +79,37 @@ class NewCameraModal extends React.Component {
       });
   };
 
+  getCameraById = (id) => {
+    if (id !== -1) {
+      fetch(`http://localhost:8080/camera/getById?cameraId=${id}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      })
+        .then((Response) => Response.json())
+        .then((camera) => {
+          let copyCamera = {};
+          copyCamera = Object.assign({}, camera);
+          delete copyCamera.groupCamera;
+          this.setState({
+            data: copyCamera,
+            existedPosition: camera.position,
+            groupCamera: camera.groupCamera,
+            originPosition: camera.position,
+          });
+          this.formRef.current.setFieldsValue({
+            ...this.state.data,
+            groupCamera: camera.groupCamera.groupId,
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
+
   getImageFromCamera = async (cameraUrl) => {
     await fetch(`http://localhost:8080/camera/getImageFromCamera`, {
       method: "POST",
@@ -116,6 +148,7 @@ class NewCameraModal extends React.Component {
           this.setState({
             error: null,
             selectedGroup: { groupId: 0, groupName: groupCamera },
+            groupCamera: { groupId: 0, groupName: groupCamera },
           });
         }
       })
@@ -126,18 +159,24 @@ class NewCameraModal extends React.Component {
 
   onFinish = async (values) => {
     this.setState({ loading: true });
-    const info = values;
+    const info = this.state.data;
     if (!this.state.existedGroup) {
       await this.checkGroup(values.groupCamera);
     }
     const image = {};
-    image.cameraUrl = info.connectionUrl;
+    image.cameraUrl = values.connectionUrl;
     await this.getImageFromCamera(image);
     this.setState({ loading: false });
     if (this.state.error === null && this.state.urlError === null) {
       const next = this.state.current + 1;
-      info.status = "inactive";
+      info.status = this.state.data.status;
+      info.location = values.location;
+      info.connectionUrl = values.connectionUrl;
+      info.position = values.position;
       info.groupCamera = this.state.selectedGroup;
+      if (this.state.lines.length !== 0) {
+        info.lines = this.state.lines;
+      }
       this.setState({ current: next, data: info });
     }
   };
@@ -146,10 +185,12 @@ class NewCameraModal extends React.Component {
     if (typeof value === "number") {
       this.state.groups.forEach((group) => {
         if (group.groupId === value) {
-          this.setState({ selectedGroup: group });
+          this.setState({ selectedGroup: group, groupCamera: group });
         }
       });
       this.getGroup(value);
+    } else {
+      this.setState({ selectedGroup: { groupId: 0, groupName: value } });
     }
   };
 
@@ -162,18 +203,26 @@ class NewCameraModal extends React.Component {
     let copyCamera = {};
     copyCamera = Object.assign({}, data);
     delete copyCamera.groupCamera;
-    const existedGroup = this.state.existedGroup;
-    const groupId = data.groupCamera.groupName;
+    console.log(copyCamera);
     this.setState({
       current: prev,
       data: copyCamera,
       existedPosition: data.position,
-      groupCamera: existedGroup ? data.groupCamera : { groupId: groupId },
+      groupCamera: data.groupCamera,
+      lines: copyCamera.lines,
     });
   };
 
   componentDidMount = () => {
     this.fetchGroupByName();
+    this.getCameraById(this.props.cameraId);
+  };
+
+  componentDidUpdate = (prop) => {
+    if (this.props.cameraId !== prop.cameraId) {
+      this.getCameraById(this.props.cameraId);
+      this.setState({ error: null });
+    }
   };
 
   render() {
@@ -186,29 +235,25 @@ class NewCameraModal extends React.Component {
       }
     };
 
+    // const checkPosition = () => {
+    //   const oldGroup =
+    //     this.formRef.current.value.groupCamera.groupName ===
+    //     this.state.data.groupCamera.groupName;
+    //   const oldPosition = this.state.existedPosition;
+    // };
+
+    const res = check();
+
     return (
       <Drawer
         height="85vh"
         placement="bottom"
-        title="Create a new camera"
+        title="Update camera"
         onClose={() => {
-          this.setState(
-            {
-              current: 0,
-              data: {
-                location: null,
-                connectionUrl: null,
-                position: null,
-                groupCamera: null,
-              },
-              groupCamera: {},
-            },
-            () => {
-              this.formRef.current.setFieldsValue({
-                ...this.state.data,
-              });
-            }
-          );
+          this.setState((prevState, prevProps) => {
+            delete prevState.data.groupCamera;
+            return { current: 0, data: { ...prevState.data } };
+          });
           this.props.onCancel();
         }}
         visible={this.props.visible}
@@ -228,7 +273,7 @@ class NewCameraModal extends React.Component {
               initialValues={{
                 groupCamera: this.state.groupCamera
                   ? this.state.groupCamera.groupId
-                  : null,
+                  : "",
                 ...this.state.data,
               }}
             >
@@ -298,8 +343,7 @@ class NewCameraModal extends React.Component {
                           </Select.Option>
                         ))}
                       {check() ? (
-                        this.state.groupCamera &&
-                        this.state.groupCamera.groupName !== "" ? (
+                        this.state.groupCamera ? (
                           <Select.Option value={this.state.groupCamera.groupId}>
                             {this.state.groupCamera.groupName}
                           </Select.Option>
@@ -317,6 +361,7 @@ class NewCameraModal extends React.Component {
                     />
                   )}
                 </Form.Item>
+                {/* {checkPosition()} */}
                 <Form.Item
                   label="Position"
                   name="position"
@@ -329,16 +374,16 @@ class NewCameraModal extends React.Component {
                     style={{ textAlign: "left", width: "95%" }}
                     onChange={this.onPositionChange}
                   >
-                    {this.state.existedPosition === null ? (
-                      <>
-                        <Select.Option value="left">left</Select.Option>
-                        <Select.Option value="right">right</Select.Option>
-                      </>
+                    {/* {this.state.existedPosition === null ? (
+                      <> */}
+                    <Select.Option value="left">left</Select.Option>
+                    <Select.Option value="right">right</Select.Option>
+                    {/* </>
                     ) : this.state.existedPosition === "left" ? (
-                      <Select.Option value="right">right</Select.Option>
+                      <Select.Option value="right">Right</Select.Option>
                     ) : (
-                      <Select.Option value="left">left</Select.Option>
-                    )}
+                      <Select.Option value="left">Left</Select.Option>
+                    )} */}
                   </Select>
                 </Form.Item>
               </div>
@@ -421,11 +466,13 @@ class NewCameraModal extends React.Component {
           </Spin>
         )}
         {this.state.current === 1 && (
-          <DrawLines
+          <UpdateLines
             prev={this.prev}
             data={this.state.data}
             image={this.state.image}
             onCancel={this.props.onCancel}
+            originPosition={this.state.originPosition}
+            groupCamera={this.state.groupCamera}
           />
         )}
       </Drawer>
@@ -433,4 +480,4 @@ class NewCameraModal extends React.Component {
   }
 }
 
-export default NewCameraModal;
+export default UpdateCameraModal;

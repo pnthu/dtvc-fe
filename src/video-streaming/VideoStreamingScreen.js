@@ -36,13 +36,14 @@ class VideoStreaming extends React.Component {
 
     //socket right
     this.rightStompClient.connect({}, (frame) => {
-      this.rightStompClient.subscribe("/dtvc/right/camera", function (
-        newFrame
-      ) {
-        var tmpFrame =
-          "data:image/jpeg;base64," + JSON.parse(newFrame.body)["frame"];
-        self.setState({ rightImageCamera: tmpFrame });
-      });
+      this.rightStompClient.subscribe(
+        "/dtvc/right/camera",
+        function (newFrame) {
+          var tmpFrame =
+            "data:image/jpeg;base64," + JSON.parse(newFrame.body)["frame"];
+          self.setState({ rightImageCamera: tmpFrame });
+        }
+      );
       this.getFrameOfRightCamera();
     });
   }
@@ -104,22 +105,26 @@ class VideoStreaming extends React.Component {
               <div>Camera 1</div>
               <img
                 src={
-                  this.state.leftImageCamera == ""
+                  this.state.leftImageCamera === ""
                     ? require("../image/black.jpg")
                     : this.state.leftImageCamera
                 }
                 alt="Left camera"
+                width={400}
+                height={250}
               />
             </div>
             <div className="camera">
               <div>Camera 2</div>
               <img
                 src={
-                  this.state.rightImageCamera == ""
+                  this.state.rightImageCamera === ""
                     ? require("../image/black.jpg")
                     : this.state.rightImageCamera
                 }
                 alt="Right camera"
+                width={400}
+                height={250}
               />
             </div>
           </div>

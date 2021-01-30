@@ -1,0 +1,15 @@
+.report-container {
+  display: grid;
+  grid-template-columns: 47% 47%;
+  column-gap: 6%;
+  row-gap: 24px;
+  background-color: #e0e0e0;
+  padding: 40px 30px;
+}
+
+.card {
+  background-color: white;
+  padding: 12px 16px;
+  text-align: center;
+  border-radius: 8px;
+}

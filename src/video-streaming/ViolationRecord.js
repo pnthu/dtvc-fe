@@ -7,7 +7,7 @@ class ViolationRecord extends React.Component {
   render() {
     return (
       <div className="parent-record parent-video-streaming">
-        <h1 className="title-record">Violation Recorded</h1>
+        <h2 className="title-record">Violation Recorded</h2>
         <div className="parent-description">
           <div className="record-description">
             <span>Violation Type: </span>

@@ -1,113 +1,89 @@
 import * as React from "react";
-import { Button, Table, Switch, Select } from "antd";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { Button, Table, Switch, Select, notification } from "antd";
+import { faPlus, faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "antd/dist/antd.css";
 import "./CameraManagement.css";
 import NewCameraModal from "./NewCameraModal";
-
-const columns = [
-  {
-    title: "No",
-    dataIndex: "no",
-    key: "no",
-  },
-  {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "Location",
-    dataIndex: "location",
-    key: "location",
-  },
-  {
-    title: "Group",
-    dataIndex: "group",
-    key: "group",
-  },
-  {
-    title: "Position",
-    dataIndex: "position",
-    key: "position",
-  },
-  {
-    title: "Status",
-    dataIndex: "status",
-    key: "status",
-    render: (status) => (
-      <>
-        {status === "on" ? (
-          <Switch checkedChildren="On" unCheckedChildren="Off" defaultChecked />
-        ) : (
-          <Switch
-            checkedChildren="On"
-            unCheckedChildren="Off"
-            defaultChecked={false}
-          />
-        )}
-      </>
-    ),
-  },
-];
-
-const data = [
-  {
-    key: "1",
-    no: 1,
-    name: "John Brown",
-    location: "New York No. 1 Lake Park",
-    group: "A",
-    position: "left",
-    status: "on",
-  },
-  {
-    key: "2",
-    no: 2,
-    name: "Jim Green",
-    location: "London No. 1 Lake Park",
-    group: "A",
-    position: "right",
-    status: "off",
-  },
-  {
-    key: "3",
-    no: 3,
-    name: "Joe Black",
-    location: "Sidney No. 1 Lake Park",
-    group: "B",
-    position: "left",
-    status: "on",
-  },
-  {
-    key: "4",
-    no: 3,
-    name: "Joe Black",
-    location: "Sidney No. 1 Lake Park",
-    group: "B",
-    position: "left",
-    status: "on",
-  },
-  {
-    key: "5",
-    no: 3,
-    name: "Joe Black",
-    location: "Sidney No. 1 Lake Park",
-    group: "C",
-    position: "left",
-    status: "on",
-  },
-];
+import UpdateCameraModal from "./UpdateCameraModal";
 
 class CameraManagement extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
-      confirmLoading: false,
+      loading: false,
+      data: [],
+      locations: [],
+      selectedLocation: "",
+      selectedStatus: "",
+      selectedRow: {},
+      updateVisible: false,
+      cameraId: -1,
     };
   }
+
+  columns = [
+    {
+      title: "No.",
+      dataIndex: "No",
+      key: "no",
+    },
+    {
+      title: "Location",
+      dataIndex: "location",
+      key: "location",
+    },
+    {
+      title: "Group",
+      dataIndex: ["groupCamera", "groupName"],
+      key: "group",
+    },
+    {
+      title: "Position",
+      dataIndex: "position",
+      key: "position",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (text, record) => {
+        let self = this;
+        return (
+          <Switch
+            style={{ width: "75px" }}
+            checkedChildren="Active"
+            unCheckedChildren="Inactive"
+            checked={record.status === "active"}
+            onClick={(checked, evt) => {
+              self.tempRecord = record;
+              self.onSwitch(checked);
+            }}
+          />
+        );
+      },
+    },
+    {
+      title: "Update",
+      dataIndex: "update",
+      key: "update",
+      render: (text, record) => (
+        <Button
+          type="primary"
+          className="detail"
+          onClick={() => {
+            this.setState({ updateVisible: true, cameraId: record.cameraId });
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faEdit}
+            style={{ fontSize: 17, alignSelf: "center" }}
+          />
+        </Button>
+      ),
+    },
+  ];
 
   showModal = () => {
     this.setState({
@@ -115,24 +91,155 @@ class CameraManagement extends React.Component {
     });
   };
 
-  handleOk = () => {
-    this.setState({
-      ModalText: "Creating new camera",
-      confirmLoading: true,
-    });
-    setTimeout(() => {
-      this.setState({
-        visible: false,
-        confirmLoading: false,
-      });
-    }, 2000);
-  };
-
   handleCancel = () => {
-    console.log("Clicked cancel button");
     this.setState({
       visible: false,
     });
+  };
+
+  handleUpdateCancel = () => {
+    this.setState({
+      updateVisible: false,
+    });
+  };
+
+  fetchCameras = () => {
+    fetch("http://localhost:8080/camera/getAll", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((Response) => Response.json())
+      .then((cameras) => {
+        this.setState({
+          data: this.addNumberIndex(cameras),
+          selectedLocation: "",
+          selectedStatus: "",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  searchLocation = (value = "") => {
+    fetch(`http://localhost:8080/camera/searchLocation?value=${value}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((Response) => Response.json())
+      .then((locations) => {
+        this.setState({ locations: locations });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  filterByLocationStatus = (location, status) => {
+    fetch(
+      `http://localhost:8080/camera/filterByLocationAndStatus?location=${location}&status=${status}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((Response) => Response.json())
+      .then((cameras) => {
+        this.setState({ data: this.addNumberIndex(cameras) });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  updateStatus = async (id, status) => {
+    await fetch(
+      `http://localhost:8080/camera/updateStatus?cameraId=${id}&status=${status}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((Response) => {
+      if (status === "active") {
+        if (Response.status === 200) {
+          notification.success({
+            message: "Activate Camera Successfully!",
+            placement: "bottomLeft",
+          });
+        } else {
+          notification.error({
+            message: "Activate Camera Failed!",
+            placement: "bottomLeft",
+          });
+        }
+      } else {
+        if (Response.status === 200) {
+          notification.success({
+            message: "Deactivate Camera Successfully!",
+            placement: "bottomLeft",
+          });
+        } else {
+          notification.error({
+            message: "Deactivate Camera Failed!",
+            placement: "bottomLeft",
+          });
+        }
+      }
+    });
+    this.fetchCameras();
+  };
+
+  onSelectedLocation = (value, option) => {
+    if (value === undefined) {
+      value = "";
+    }
+    this.setState({ selectedLocation: value });
+    this.filterByLocationStatus(value, this.state.selectedStatus);
+  };
+
+  onSelectedStatus = (value, option) => {
+    this.setState({ selectedStatus: value });
+    this.filterByLocationStatus(this.state.selectedLocation, value);
+  };
+
+  onSwitch = async (checked) => {
+    let newStatus;
+    let record = this.tempRecord;
+    if (checked) {
+      newStatus = "active";
+    } else {
+      newStatus = "inactive";
+    }
+    record.status = newStatus;
+    await this.updateStatus(record.cameraId, newStatus);
+  };
+
+  addNumberIndex = (list) => {
+    let index = 1;
+    for (let i = 0; i < list.length; i++) {
+      list[i]["No"] = index;
+      index++;
+    }
+    return list;
+  };
+
+  componentDidMount = () => {
+    this.setState({ loading: true });
+    this.searchLocation();
+    this.fetchCameras();
+    this.setState({ loading: false });
   };
 
   render() {
@@ -141,33 +248,61 @@ class CameraManagement extends React.Component {
         <div className="background">
           <div className="box">
             <h2 className="title">Camera Management</h2>
-            <div className="parent-create-new">
-              <div className="filter">
-                <Select showSearch placeholder="Location"></Select>
-                <Select placeholder="Status">
-                  <Select.Option>Active</Select.Option>
-                  <Select.Option>Inactive</Select.Option>
+            <div className="top-row">
+              <div className="camera-filter">
+                <Select
+                  // value={this.state.selectedLocation}
+                  showSearch
+                  allowClear
+                  placeholder="Location"
+                  style={{ width: "50%" }}
+                  onSearch={this.searchLocation}
+                  onChange={this.onSelectedLocation}
+                >
+                  {this.state.locations.length !== 0 &&
+                    this.state.locations.map((location) => (
+                      <Select.Option
+                        key={location.location}
+                        value={location.location}
+                      >
+                        {location.location}
+                      </Select.Option>
+                    ))}
+                </Select>
+                <Select
+                  value={this.state.selectedStatus}
+                  placeholder="Status"
+                  style={{ width: "40%" }}
+                  onChange={this.onSelectedStatus}
+                >
+                  <Select.Option value="">All Status</Select.Option>
+                  <Select.Option value="Active">Active</Select.Option>
+                  <Select.Option value="Inactive">Inactive</Select.Option>
                 </Select>
               </div>
-              <Button onClick={this.showModal}>
-                <FontAwesomeIcon icon={faPlus} />
-                <span className="new-camera">New Camera</span>
-              </Button>
+              <div className="new-btn">
+                <Button onClick={this.showModal}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  <span className="new-camera">New Camera</span>
+                </Button>
+              </div>
             </div>
-            <div className="camera-table">
-              <Table
-                columns={columns}
-                dataSource={data}
-                pagination={{ defaultCurrent: 1, total: 10, pageSize: 10 }}
-              />
-            </div>
+            <Table
+              className="table"
+              columns={this.columns}
+              dataSource={this.state.data}
+              loading={this.state.loading}
+            />
           </div>
         </div>
         <NewCameraModal
-          handleOk={this.handleOk}
           visible={this.state.visible}
-          confirmLoading={this.state.confirmLoading}
           onCancel={this.handleCancel}
+        />
+        <UpdateCameraModal
+          visible={this.state.updateVisible}
+          cameraId={this.state.cameraId}
+          onCancel={this.handleUpdateCancel}
         />
       </>
     );

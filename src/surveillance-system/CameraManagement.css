@@ -1,11 +1,23 @@
-.parent-create-new {
-  text-align: right;
+.top-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 30px 0px 30px;
 }
 
-.camera-table {
-  width: 97%;
-  margin-right: auto;
-  margin-left: auto;
+.camera-filter {
+  display: flex;
+  width: 40%;
+  justify-content: space-between;
+}
+
+.new-btn button {
+  border-color: #17608d;
+  border-radius: 8px;
+  padding: 8px 15px;
+  height: auto;
+  color: #17608d;
 }
 
 .new-camera {

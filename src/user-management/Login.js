@@ -1,6 +1,6 @@
 import * as React from "react";
 import "antd/dist/antd.css";
-import { Button, Input, Form } from "antd";
+import { Button, Input, Form, Typography } from "antd";
 import "./Login.css";
 
 class Login extends React.Component {
@@ -12,14 +12,22 @@ class Login extends React.Component {
     };
   }
 
+  login = (values) => {
+    this.props.login(values);
+  };
+
   render() {
     console.log("props", this.props);
     return (
       <div className="loginBackground">
         <h1 className="loginTitle">Traffic Violation Detection System</h1>
         <img src={require("../logo.svg")} alt="logo" className="logo" />
-
-        <Form name="basic" style={{ width: "50%" }}>
+        {this.props.error !== null && (
+          <Typography.Text type="danger" style={{ textAlign: "left" }}>
+            {this.props.error}
+          </Typography.Text>
+        )}
+        <Form name="basic" style={{ width: "40%" }} onFinish={this.login}>
           <Form.Item
             name="username"
             rules={[{ required: true, message: "Please input your username" }]}
@@ -33,12 +41,7 @@ class Login extends React.Component {
             <Input.Password placeholder="Password" />
           </Form.Item>
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              onClick={this.props.login}
-              className="login"
-            >
+            <Button type="primary" htmlType="submit" className="login">
               Sign In
             </Button>
           </Form.Item>

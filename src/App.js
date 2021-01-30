@@ -3,11 +3,7 @@ import Body from "./body/Body";
 
 class App extends React.Component {
   render() {
-    return (
-      <div>
-        <Body />
-      </div>
-    );
+    return <Body />;
   }
 }
 
